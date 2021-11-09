@@ -1,24 +1,38 @@
 import { Router, Response, Request } from 'express';
-import { db } from '../config/db';
-import { OrderItems } from '../models/Order_items';
+
 import { Product } from '../models/Products';
 export const router: Router = Router();
+const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 
-router.post('/product/post', async (req: Request, res: Response) => {
+router.post('/product/post', [auth, admin], async (req: Request, res: Response) => {
   try {
-    const product = await Product.create({ product_id: 3, name: 'null', description: 'null', unit_price: 0, number_in_stock: 1000 });
+    const product = await Product.create({ name: req.body.name, description: req.body.desc, unit_price: req.body.price, number_in_stock: req.body.number_in_stock });
     res.send(product);
   } catch (er) {
     res.send(er);
   }
 });
 
-router.post('/product/destroy', async (req: Request, res: Response) => {
+router.post('/product/destroy', [auth, admin], async (req: Request, res: Response) => {
   try {
     const product = await Product.findByPk(1);
-    await product?.destroy();
-    res.send(product);
+    if (!product) {
+      res.status(404).send('no such product');
+    } else {
+      await product?.destroy();
+      res.send(product);
+    }
   } catch (er) {
     res.send(er);
+  }
+});
+
+router.get('/products', auth, async (req: Request, res: Response) => {
+  try {
+    const products = await Product.findAll();
+    res.send(products);
+  } catch (er) {
+    res.status(500).send(er);
   }
 });

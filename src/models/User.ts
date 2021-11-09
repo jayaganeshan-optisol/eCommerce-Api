@@ -9,6 +9,7 @@ interface IUser {
   password: string;
   is_premium: boolean;
   is_admin: boolean;
+  shipping_address: string;
 }
 interface IUserAttributes extends Optional<IUser, 'user_id'> {}
 export class User extends Model<IUser, IUserAttributes> {}
@@ -38,6 +39,12 @@ User.init(
     password: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        len: {
+          args: [8, 55],
+          msg: 'string length not in range',
+        },
+      },
     },
     is_premium: {
       type: DataTypes.BOOLEAN,
@@ -47,6 +54,10 @@ User.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    shipping_address: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     sequelize: db,
@@ -54,6 +65,5 @@ User.init(
     timestamps: false,
   }
 );
-
 User.hasMany(Order, { foreignKey: 'user_id' });
 Order.belongsTo(User, { foreignKey: 'user_id' });

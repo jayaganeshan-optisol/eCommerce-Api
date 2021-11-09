@@ -6,13 +6,12 @@ export class Order extends Model {
   public user_id!: number;
   public order_id!: number;
   public date!: string;
-  public shipping_address!: string;
 }
 
 Order.init(
   {
     user_id: {
-      type: DataTypes.UUIDV4,
+      type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       primaryKey: true,
     },
@@ -23,10 +22,6 @@ Order.init(
       primaryKey: true,
     },
     date: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    shipping_address: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -38,3 +33,7 @@ Order.init(
   }
 );
 Order.belongsToMany(Product, { through: 'Order_items' });
+export const calcDate = () => {
+  const date = new Date();
+  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+};
