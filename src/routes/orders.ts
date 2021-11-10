@@ -7,14 +7,15 @@ import { User } from '../models/User';
 export const router: Router = Router();
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
-
+//create order by user
 router.post('/order', auth, async (req: Request, res: Response) => {
   const { user_id } = req.body.tokenPayload;
   const { product_id, quantity } = req.body;
+  const user: any = await User.findByPk(user_id);
 
   try {
     await db.transaction(async t => {
-      const order: any = await Order.create({ user_id, date: calcDate() }, { transaction: t });
+      const order: any = await Order.create({ user_id: user.user_id, date: calcDate() }, { transaction: t });
       for (let i = 0; i < product_id.length; i++) {
         let product: any = await Product.findByPk(product_id[i]);
         if (product === null) {

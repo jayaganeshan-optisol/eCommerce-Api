@@ -1,5 +1,5 @@
 import { Router, Request, Response, json } from 'express';
-import { User } from '../models/User';
+import { IUserOutput, User } from '../models/User';
 import { enc, AES } from 'crypto-js';
 import { sign } from 'jsonwebtoken';
 
@@ -45,6 +45,7 @@ router.post('/login', async (req: Request, res: Response) => {
   try {
     let user: any;
     user = await User.findOne({ where: { email: req.body.email } });
+    console.log(user);
     if (!user) {
       res.send('No Such User');
     } else {

@@ -1,5 +1,6 @@
 import { Model, DataTypes, Optional } from 'sequelize';
 import { db } from '../config/db';
+import { User } from './User';
 
 export interface IProduct {
   product_id: number;
@@ -21,7 +22,6 @@ Product.init(
     name: {
       type: DataTypes.STRING(45),
       allowNull: false,
-      primaryKey: true,
     },
     description: {
       type: DataTypes.STRING(255),
@@ -42,3 +42,4 @@ Product.init(
     timestamps: false,
   }
 );
+// Product.belongsToMany(User, { through: 'cart' });

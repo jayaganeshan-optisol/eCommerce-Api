@@ -1,6 +1,7 @@
 import { Model, DataTypes, Optional } from 'sequelize';
 import { db } from '../config/db';
 import { Order } from '../models/Orders';
+import { Product } from '../models/Products';
 
 interface IUser {
   user_id: number;
@@ -12,6 +13,7 @@ interface IUser {
   shipping_address: string;
 }
 interface IUserAttributes extends Optional<IUser, 'user_id'> {}
+export interface IUserOutput extends Required<IUser> {}
 export class User extends Model<IUser, IUserAttributes> {}
 
 User.init(
@@ -67,3 +69,5 @@ User.init(
 );
 User.hasMany(Order, { foreignKey: 'user_id' });
 Order.belongsTo(User, { foreignKey: 'user_id' });
+User.belongsToMany(Product, { through: 'cart', foreignKey: 'product_id' });
+Product.belongsToMany(User, { through: 'cart', foreignKey: 'user_id' });
