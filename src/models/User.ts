@@ -3,6 +3,7 @@ import { db } from '../config/db';
 import { Order } from './Orders';
 import { Product } from '../models/Products';
 import { Cart } from './Cart';
+import { WishList } from './WishList';
 
 interface IUser {
   user_id: number;
@@ -68,3 +69,6 @@ User.hasMany(Order, { foreignKey: 'user_id' });
 
 User.belongsToMany(Product, { through: Cart, foreignKey: 'user_id' });
 Product.belongsToMany(User, { through: Cart, foreignKey: 'product_id' });
+
+User.belongsToMany(Product, { through: WishList, foreignKey: 'user_id' });
+Product.belongsToMany(User, { through: WishList, foreignKey: 'product_id' });
