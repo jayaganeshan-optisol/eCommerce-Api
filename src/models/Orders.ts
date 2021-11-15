@@ -1,5 +1,6 @@
 import { Model, DataTypes, Optional } from 'sequelize';
 import { db } from '../config/db';
+import { OrderItems } from './Order_items';
 import { Product } from './Products';
 
 interface IOrder {
@@ -33,7 +34,8 @@ Order.init(
     timestamps: false,
   }
 );
-Order.belongsToMany(Product, { through: 'Order_items' });
+Order.belongsToMany(Product, { through: OrderItems, foreignKey: 'order_id' });
+Product.belongsToMany(Order, { through: OrderItems, foreignKey: 'product_id' });
 
 export const calcDate = () => {
   const date = new Date();

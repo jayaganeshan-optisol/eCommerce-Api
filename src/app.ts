@@ -4,7 +4,7 @@ import { router as authRouter } from './routes/user';
 import { router as orderRouter } from './routes/orders';
 import { router as productRouter } from './routes/product';
 import { router as cartRouter } from './routes/cart';
-const cors = require('cors');
+import cors from 'cors';
 
 import { config } from 'dotenv';
 
@@ -16,9 +16,9 @@ app.listen(PORT, (): void => {
 });
 config();
 app.use(express.json());
+app.use(cors());
 app.use(authRouter);
 app.use(orderRouter);
 app.use(productRouter);
-app.use(cartRouter);
-app.use(cors());
-db.authenticate().then(() => console.log('connected to db'));
+app.use('/cart', cartRouter);
+db.authenticate().then(() => console.log('connected to DB'));

@@ -32,7 +32,7 @@ router.post('/order', auth, async (req: Request, res: Response) => {
 });
 //find orders by User
 router.get('/orders/all', [auth, admin], async (req: any, res: Response) => {
-  const order_items = await User.findAll({ include: Order });
+  const order_items = await User.findAll({ include: { model: Order } });
   res.send(order_items);
 });
 
@@ -42,7 +42,7 @@ router.delete('/orders/:id', async (req: Request, res: Response) => {
     await db.transaction(async t => {
       const orderItems = await OrderItems.findAll({ where: { order_id: req.params.id } });
       if (orderItems.length == 0) {
-        res.send('no such order');
+        res.send('no orders');
       } else {
         orderItems.forEach(async order => await order.destroy({ transaction: t }));
         const order = await Order.findOne({ where: { order_id: req.params.id } });
@@ -50,11 +50,15 @@ router.delete('/orders/:id', async (req: Request, res: Response) => {
           res.send('no such order');
         } else {
           await order?.destroy({ transaction: t });
-          res.send('success');
+          res.send('order cancelled');
         }
       }
     });
   } catch (er) {
     res.status(500).send(er);
   }
+});
+router.get('/test', async (req: Request, res: Response) => {
+  const order_items = await Order.findAll({ include: Product });
+  res.send(order_items);
 });
