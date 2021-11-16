@@ -5,8 +5,8 @@ import { router as orderRouter } from './routes/orders';
 import { router as productRouter } from './routes/product';
 import { router as cartRouter } from './routes/cart';
 import { router as ListRouter } from './routes/wishlist';
+import error from './middleware/error';
 import cors from 'cors';
-
 import { config } from 'dotenv';
 
 const app: Application = express();
@@ -23,4 +23,5 @@ app.use(orderRouter);
 app.use(productRouter);
 app.use('/cart', cartRouter);
 app.use('/wishlist', ListRouter);
+app.use(error);
 db.authenticate().then(() => console.log('connected to DB'));

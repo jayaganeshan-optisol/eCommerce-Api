@@ -4,7 +4,6 @@ import { Order } from './Orders';
 import { Product } from '../models/Products';
 import { Cart } from './Cart';
 import { WishList } from './WishList';
-
 interface IUser {
   user_id: number;
   name: string;

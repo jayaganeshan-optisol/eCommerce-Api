@@ -4,7 +4,7 @@ import { User } from '../models/User';
 import { WishList } from '../models/WishList';
 
 export const router = Router();
-const auth = require('../middleware/auth');
+import auth from '../middleware/auth';
 
 //get all products in wishlist by user
 router.get('/', auth, async (req: Request, res: Response) => {
@@ -32,11 +32,7 @@ router.delete('/remove', auth, async (req: Request, res: Response) => {
 
 router.delete('/remove/all', auth, async (req: Request, res: Response) => {
   const { user_id } = req.body.tokenPayload;
-  try {
-    const list = await WishList.destroy({ where: { user_id } });
-    if (list > 0) return res.send('removed successfully');
-    return res.send('no changes made');
-  } catch (er) {
-    res.send(500).send(er);
-  }
+  const list = await WishList.destroy({ where: { user_id } });
+  if (list > 0) return res.send('removed successfully');
+  return res.send('no changes made');
 });
