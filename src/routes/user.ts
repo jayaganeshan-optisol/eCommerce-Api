@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { User } from '../models/User';
+import { User, validateUser } from '../models/User';
 import { enc, AES } from 'crypto-js';
 import { sign } from 'jsonwebtoken';
 import auth from '../middleware/auth';
@@ -10,6 +10,11 @@ const Verifier = require('email-verifier');
 export const router: Router = Router();
 //Creating new User
 router.post('/register', async (req: Request, res: Response) => {
+  const { name, email, password } = req.body;
+  const { error } = validateUser({ name, email, password });
+  if (error) {
+    return res.status(400).send(error.details[0].message);
+  }
   const verifier = new Verifier(process.env.EMAIL_VERIFY);
   let result: any;
 

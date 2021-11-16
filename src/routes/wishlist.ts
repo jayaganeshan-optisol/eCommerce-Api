@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { Product } from '../models/Products';
 import { User } from '../models/User';
-import { WishList } from '../models/WishList';
+import { validateWishlist, WishList } from '../models/WishList';
 
 export const router = Router();
 import auth from '../middleware/auth';
@@ -17,6 +17,8 @@ router.get('/', auth, async (req: Request, res: Response) => {
 router.post('/add', auth, async (req: Request, res: Response) => {
   const { user_id } = req.body.tokenPayload;
   const { product_id } = req.body;
+  const { error } = validateWishlist({ user_id, product_id });
+  if (error) return res.status(400).send(error.details[0].message);
   const list = await WishList.create({ user_id, product_id });
   res.send(list);
 });

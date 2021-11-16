@@ -1,3 +1,4 @@
+import Joi, { string } from 'joi';
 import { Model, DataTypes, Optional } from 'sequelize';
 import { db } from '../config/db';
 import { OrderItems } from './Order_items';
@@ -40,4 +41,17 @@ Product.belongsToMany(Order, { through: OrderItems, foreignKey: 'product_id' });
 export const calcDate = () => {
   const date = new Date();
   return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+};
+
+export const validateOrder = (order: object): { error: Joi.ValidationError | undefined } => {
+  const schema = Joi.object({
+    user_id: Joi.number().required(),
+    date: Joi.string().pattern(new RegExp('((?:19|20)\\d\\d)-(0?[1-9]|1[012])-([12][0-9]|3[01]|0?[1-9])')),
+  });
+  const { error } = schema.validate(order);
+  if (error) {
+    return { error };
+  } else {
+    return { error: undefined };
+  }
 };

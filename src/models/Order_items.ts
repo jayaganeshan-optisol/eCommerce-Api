@@ -1,12 +1,13 @@
+import Joi from 'joi';
 import { Model, DataTypes } from 'sequelize';
 import { db } from '../config/db';
 
-export class OrderItems extends Model {
-  public product_id!: number;
-  public order_id!: number;
-  public quantity!: number;
-  public unit_price!: number;
+export interface IOrderItems {
+  product_id: number;
+  order_id: string;
+  quantity: string;
 }
+export class OrderItems extends Model<IOrderItems> {}
 
 OrderItems.init(
   {
@@ -24,10 +25,6 @@ OrderItems.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    unit_price: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
   },
   {
     sequelize: db,
@@ -35,3 +32,19 @@ OrderItems.init(
     timestamps: false,
   }
 );
+
+export const validateOrderItems = (orderItems: object): { error: Joi.ValidationError | undefined } => {
+  const schema = Joi.object({
+    product_id: Joi.number().required(),
+    order_id: Joi.number().required(),
+    quantity: Joi.number().required(),
+  });
+  const { error } = schema.validate(orderItems);
+  if (error) {
+    return { error };
+  } else {
+    return {
+      error: undefined,
+    };
+  }
+};

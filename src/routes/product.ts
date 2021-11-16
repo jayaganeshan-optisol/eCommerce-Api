@@ -1,13 +1,19 @@
 import { Router, Response, Request } from 'express';
 import { OrderItems } from '../models/Order_items';
-
-import { Product } from '../models/Products';
-export const router: Router = Router();
 import auth from '../middleware/auth';
 import admin from '../middleware/admin';
+
+import { Product, validateProduct } from '../models/Products';
+export const router: Router = Router();
+
 //Post a product by admin
 router.post('/product/post', [auth, admin], async (req: Request, res: Response) => {
-  const product = await Product.create({ name: req.body.name, description: req.body.desc, unit_price: req.body.price, number_in_stock: req.body.number_in_stock });
+  const { product_name, description, unit_price, number_in_stock } = req.body;
+  const { error } = validateProduct({ product_name, description, unit_price, number_in_stock });
+  if (error) {
+    return res.status(400).send(error.details[0].message);
+  }
+  const product = await Product.create({ product_name, description, unit_price, number_in_stock });
   res.send(product);
 });
 //Delete Product by admin
