@@ -67,8 +67,8 @@ User.init(
 );
 User.hasMany(Order, { foreignKey: 'user_id' });
 
-User.belongsToMany(Product, { through: Cart, foreignKey: 'user_id' });
-Product.belongsToMany(User, { through: Cart, foreignKey: 'product_id' });
+User.belongsToMany(Product, { through: Cart, foreignKey: 'user_id', as: 'bag' });
+Product.belongsToMany(User, { through: Cart, foreignKey: 'product_id', as: 'bag' });
 
 User.belongsToMany(Product, { through: WishList, foreignKey: 'user_id' });
 Product.belongsToMany(User, { through: WishList, foreignKey: 'product_id' });
@@ -79,7 +79,7 @@ export const validateUser = (user: object): { error: Joi.ValidationError | undef
     email: Joi.string().min(8).max(45).required(),
     password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{8,30}$')),
   });
-  const { error, value } = schema.validate(user);
+  const { error } = schema.validate(user);
   if (error) {
     return { error };
   } else {

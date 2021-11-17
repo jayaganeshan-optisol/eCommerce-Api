@@ -1,40 +1,16 @@
-import { Router, Request, Response } from 'express';
-import { Product } from '../models/Products';
-import { User } from '../models/User';
-import { validateWishlist, WishList } from '../models/WishList';
+import { Router } from 'express';
+import { wishlistController } from '../controllers/wishlist.controller';
 
 export const router = Router();
 import auth from '../middleware/auth';
 
 //get all products in wishlist by user
-router.get('/', auth, async (req: Request, res: Response) => {
-  const { user_id } = req.body.tokenPayload;
-  const list = await User.findAll({ include: Product, where: { user_id } });
-  res.send(list);
-});
+router.get('/', auth, wishlistController.getAllById);
 
 //add product to wishlist
-router.post('/add', auth, async (req: Request, res: Response) => {
-  const { user_id } = req.body.tokenPayload;
-  const { product_id } = req.body;
-  const { error } = validateWishlist({ user_id, product_id });
-  if (error) return res.status(400).send(error.details[0].message);
-  const list = await WishList.create({ user_id, product_id });
-  res.send(list);
-});
+router.post('/add', auth, wishlistController.add);
 //remove a product from wishlist
-router.delete('/remove', auth, async (req: Request, res: Response) => {
-  const { user_id } = req.body.tokenPayload;
-  const { product_id } = req.body;
-  const list = await WishList.destroy({ where: { user_id, product_id } });
-  if (list > 0) return res.send('removed successfully');
-  return res.send('no changes made');
-});
+router.delete('/remove', auth, wishlistController.removeById);
 //remove all products from wishlist
 
-router.delete('/remove/all', auth, async (req: Request, res: Response) => {
-  const { user_id } = req.body.tokenPayload;
-  const list = await WishList.destroy({ where: { user_id } });
-  if (list > 0) return res.send('removed successfully');
-  return res.send('no changes made');
-});
+router.delete('/remove/all', auth, wishlistController.removeAll);
