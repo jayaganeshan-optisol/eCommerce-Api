@@ -4,7 +4,8 @@ import { Order } from './Orders';
 import { Product } from '../models/Products';
 import { Cart } from './Cart';
 import { WishList } from './WishList';
-import Joi, { object } from 'joi';
+import Joi from 'joi';
+import { sign } from 'jsonwebtoken';
 interface IUser {
   user_id: number;
   name: string;
@@ -88,3 +89,5 @@ export const validateUser = (user: object): { error: Joi.ValidationError | undef
     };
   }
 };
+
+//jwt token generation
