@@ -6,44 +6,53 @@ import { Product } from '../models/Products';
 import { User } from '../models/User';
 import auth from '../middleware/auth';
 import admin from '../middleware/admin';
-import { Op } from 'sequelize';
 
 export const router: Router = Router();
 //create order by user
 router.post('/order', auth, async (req: Request, res: Response) => {
+  const t = await db.transaction();
+  const { user_id } = req.body.tokenPayload;
+  const { product } = req.body;
   try {
-    const { user_id } = req.body.tokenPayload;
-    const { product } = req.body;
     const user: any = await User.findByPk(user_id);
+    if (!user) return res.status(400).send('user not found');
+    if (user.shipping_address === null) return res.status(400).send('no shipping address');
 
-    const t = await db.transaction();
-    const { error } = validateOrder({ user_id: user.user_id, date: calcDate() });
-    console.log(calcDate());
+    let products = [];
+    let errorProduct;
+
+    for (let i = 0; i < product.length; i++) {
+      const result: any = await Product.findByPk(product[i].product_id);
+      if (!result) {
+        errorProduct = 'product id ' + product[i].product_id + ' not found';
+      }
+      if (result.number_in_stock < product[i].quantity) {
+        errorProduct = 'product id ' + product[i].quantity + " don't have enough stock";
+        break;
+      }
+      products.push(result);
+    }
+    if (errorProduct) return res.status(400).send(errorProduct);
+    const { error } = validateOrder({ user_id: user_id, date: calcDate() });
     if (error) {
       return res.status(400).send(error.details[0].message);
     }
-    const order: any = await Order.create({ user_id: user.user_id, date: calcDate() }, { transaction: t });
+
+    const order: any = await Order.create({ user_id: user_id, date: calcDate() }, { transaction: t });
 
     for (let i = 0; i < product.length; i++) {
-      let result: any = await Product.findOne({ where: { [Op.and]: [{ product_id: product[i].product_id }, { number_in_stock: { [Op.gte]: product[i].quantity } }] } });
-      if (!result) {
-        const prod: any = await Product.findByPk(product[i].product_id);
-        await t.rollback();
-        return res.status(200).send(`${prod.product_name} out of stock`);
-      } else {
-        const { error } = validateOrderItems({ product_id: result.product_id, order_id: order.order_id, quantity: product[i].quantity });
-        if (error) {
-          return res.status(400).send(error.details[0].message);
-        }
-        await OrderItems.create({ product_id: result.product_id, order_id: order.order_id, quantity: product[i].quantity }, { transaction: t });
-        result.decrement({ number_in_stock: product[i].quantity }, { where: { product_id: product[i].product_id } });
-        await result.save();
+      const { error } = validateOrderItems({ product_id: product[i].product_id, order_id: order.order_id, quantity: product[i].quantity });
+      if (error) {
+        return res.status(400).send(error.details[0].message);
       }
+      await Product.increment({ number_in_stock: -product[i].quantity }, { where: { product_id: product[i].product_id }, transaction: t });
+      await OrderItems.create({ product_id: product[i].product_id, order_id: order.order_id, quantity: product[i].quantity }, { transaction: t });
     }
     await t.commit();
     res.send(order);
   } catch (er) {
-    res.send(er);
+    await t.rollback();
+    res.status(500).send(er);
   }
 });
 //find orders by User
@@ -60,7 +69,7 @@ router.delete('/orders/:id', async (req: Request, res: Response) => {
     res.send('no orders');
   } else {
     orderItems.forEach(async (order: any) => {
-      await Product.increment({ number_in_stock: order.quantity }, { where: { product_id: order.product_id } });
+      await Product.increment({ number_in_stock: order.quantity }, { where: { product_id: order.product_id }, transaction: t });
       await order.destroy({ transaction: t });
     });
     const order = await Order.findOne({ where: { order_id: req.params.id } });

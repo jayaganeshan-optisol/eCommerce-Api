@@ -37,7 +37,7 @@ export const validateOrderItems = (orderItems: object): { error: Joi.ValidationE
   const schema = Joi.object({
     product_id: Joi.number().required(),
     order_id: Joi.number().required(),
-    quantity: Joi.number().required(),
+    quantity: Joi.number().min(1).required(),
   });
   const { error } = schema.validate(orderItems);
   if (error) {
