@@ -1,7 +1,7 @@
-import { sign } from 'jsonwebtoken';
-import { AES, enc } from 'crypto-js';
 import { Request, Response } from 'express';
 import { validateUser, User } from '../models/User';
+import { comparePassword, hashPassword } from '../services/passwordHandling';
+import { generateToken } from '../services/generateToken';
 
 const Verifier = require('email-verifier');
 const register = async (req: Request, res: Response) => {
@@ -28,7 +28,7 @@ const register = async (req: Request, res: Response) => {
       if (user) {
         res.send('User already Exists');
       } else {
-        const password = AES.encrypt(req.body.password, process.env.PASS_HASH as string).toString();
+        const password = hashPassword(req.body.password);
         user = await User.create({ name: req.body.name, email: req.body.email, password, is_admin: req.body.is_admin, is_premium: req.body.is_premium, shipping_address: req.body.shipping_address });
         res.send(user);
       }
@@ -43,10 +43,10 @@ const login = async (req: Request, res: Response) => {
     res.send('No Such User');
   } else {
     const { password } = user;
-    const pass = AES.decrypt(password, process.env.PASS_HASH as string).toString(enc.Utf8);
-    pass !== req.body.password && res.send('Wrong Password');
+    const pass = comparePassword(password, req.body.password);
+    if (!pass) return res.send('Wrong Password');
     const { user_id, is_admin } = user;
-    const token = sign({ user_id, is_admin }, process.env.SEC_HASH as string, { expiresIn: '3d' });
+    const token = generateToken({ user_id, is_admin });
     res.header('x-auth', token).send(token);
   }
 };
@@ -57,12 +57,11 @@ const changepassword = async (req: Request, res: Response) => {
     res.send('No Such User');
   } else {
     const { password }: any = user;
-    const pass = AES.decrypt(password, process.env.PASS_HASH as string).toString(enc.Utf8);
-
-    if (pass !== req.body.oldPassword) {
+    const pass = comparePassword(password, req.body.oldPassword);
+    if (!pass) {
       res.send('Old Password do not match');
     } else {
-      const newPass = AES.encrypt(req.body.newPassword, process.env.PASS_HASH as string).toString();
+      const newPass = hashPassword(req.body.newPassword);
       user.password = newPass;
       await user.save();
       res.status(202).send(user);

@@ -17,3 +17,7 @@ router.get('/users', [auth, admin], userController.findAll);
 //adding shipping address
 
 router.patch('/update/shipping', [auth], userController.addShipping);
+
+router.get('/test', (req, res) => {
+  throw new Error();
+});
