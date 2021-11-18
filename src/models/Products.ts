@@ -1,4 +1,3 @@
-import Joi from 'joi';
 import { Model, DataTypes, Optional } from 'sequelize';
 import { db } from '../config/db';
 
@@ -42,19 +41,3 @@ Product.init(
     timestamps: false,
   }
 );
-export const validateProduct = (product: object): { error: Joi.ValidationError | undefined } => {
-  const schema = Joi.object({
-    product_name: Joi.string().required(),
-    description: Joi.string().required(),
-    unit_price: Joi.number().required(),
-    number_in_stock: Joi.number().required(),
-  });
-  const { error } = schema.validate(product);
-  if (error) {
-    return { error };
-  } else {
-    return {
-      error: undefined,
-    };
-  }
-};

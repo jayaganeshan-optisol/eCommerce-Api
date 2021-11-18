@@ -2,10 +2,11 @@ import { Router } from 'express';
 import auth from '../middleware/auth';
 import admin from '../middleware/admin';
 import { userController } from '../controllers/user.controller';
+import { validateUser } from '../middleware/validate';
 
 export const router: Router = Router();
 //Creating new User
-router.post('/register', userController.register);
+router.post('/register', validateUser, userController.register);
 
 //Login
 router.post('/login', userController.login);
