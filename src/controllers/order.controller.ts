@@ -29,18 +29,10 @@ const createOrder = async (req: Request, res: Response) => {
       products.push(result);
     }
     if (errorProduct) return res.status(400).send(errorProduct);
-    const { error } = validateOrder({ user_id: user_id, date: calcDate() });
-    if (error) {
-      return res.status(400).send(error.details[0].message);
-    }
 
     const order: any = await Order.create({ user_id: user_id, date: calcDate() }, { transaction: t });
 
     for (let i = 0; i < product.length; i++) {
-      const { error } = validateOrderItems({ product_id: product[i].product_id, order_id: order.order_id, quantity: product[i].quantity });
-      if (error) {
-        return res.status(400).send(error.details[0].message);
-      }
       await Product.increment({ number_in_stock: -product[i].quantity }, { where: { product_id: product[i].product_id }, transaction: t });
       await OrderItems.create({ product_id: product[i].product_id, order_id: order.order_id, quantity: product[i].quantity }, { transaction: t });
     }

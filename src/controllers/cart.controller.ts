@@ -3,14 +3,10 @@ import { Op } from 'sequelize';
 import { Cart, validateCart } from '../models/Cart';
 import { Product } from '../models/Products';
 import { User } from '../models/User';
-
+//creation
 const createCart = async (req: Request, res: Response) => {
   const { product_id, quantity } = req.body;
   const { user_id } = req.body.tokenPayload;
-  const { error } = validateCart({ user_id, product_id, quantity });
-  if (error) {
-    return res.status(400).send(error.details[0].message);
-  }
   const exists = await Cart.findOne({ where: { user_id, product_id } });
   if (exists) {
     return res.redirect('/cart/update');

@@ -1,13 +1,9 @@
-import { Router, Response, Request } from 'express';
+import { Response, Request } from 'express';
 import { OrderItems } from '../models/Order_items';
-import { Product, validateProduct } from '../models/Products';
+import { Product } from '../models/Products';
 
 const createProduct = async (req: Request, res: Response) => {
   const { product_name, description, unit_price, number_in_stock } = req.body;
-  const { error } = validateProduct({ product_name, description, unit_price, number_in_stock });
-  if (error) {
-    return res.status(400).send(error.details[0].message);
-  }
   const product = await Product.create({ product_name, description, unit_price, number_in_stock });
   res.send(product);
 };
