@@ -28,6 +28,5 @@ OrderItems.init(
   {
     sequelize: db,
     modelName: 'order_item',
-    timestamps: false,
   }
 );

@@ -1,5 +1,5 @@
-import { Model, DataTypes, Optional } from 'sequelize';
-import { db } from '../config/db';
+import { Model, DataTypes, Optional } from "sequelize";
+import { db } from "../config/db";
 
 export interface IProduct {
   product_id: number;
@@ -7,8 +7,9 @@ export interface IProduct {
   description: string;
   unit_price: number;
   number_in_stock: number;
+  // seller_name: string;
 }
-interface IProductsAttributes extends Optional<IProduct, 'product_id'> {}
+interface IProductsAttributes extends Optional<IProduct, "product_id"> {}
 export class Product extends Model<IProduct, IProductsAttributes> {}
 
 Product.init(
@@ -34,10 +35,13 @@ Product.init(
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
     },
+    // seller_name: {
+    //   type: DataTypes.STRING,
+    //   allowNull: false,
+    // },
   },
   {
     sequelize: db,
-    modelName: 'product',
-    timestamps: false,
+    modelName: "product",
   }
 );

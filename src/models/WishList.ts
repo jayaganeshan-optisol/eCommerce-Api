@@ -10,6 +10,5 @@ WishList.init(
   {
     sequelize: db,
     modelName: 'wishlist',
-    timestamps: false,
   }
 );

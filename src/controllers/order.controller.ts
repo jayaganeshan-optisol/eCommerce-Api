@@ -1,7 +1,7 @@
 import { Response, Request } from 'express';
 import { db } from '../config/db';
-import { calcDate, Order, validateOrder } from '../models/Orders';
-import { OrderItems, validateOrderItems } from '../models/Order_items';
+import { calcDate, Order } from '../models/Orders';
+import { OrderItems } from '../models/Order_items';
 import { Product } from '../models/Products';
 import { User } from '../models/User';
 
@@ -9,39 +9,35 @@ const createOrder = async (req: Request, res: Response) => {
   const t = await db.transaction();
   const { user_id } = req.body.tokenPayload;
   const { product } = req.body;
-  try {
-    const user: any = await User.findByPk(user_id);
-    if (!user) return res.status(400).send('user not found');
-    if (user.shipping_address === null) return res.status(400).send('no shipping address');
 
-    let products = [];
-    let errorProduct;
+  const user: any = await User.findByPk(user_id);
+  if (!user) return res.status(400).send('user not found');
+  if (user.shipping_address === null) return res.status(400).send('no shipping address');
 
-    for (let i = 0; i < product.length; i++) {
-      const result: any = await Product.findByPk(product[i].product_id);
-      if (!result) {
-        errorProduct = 'product id ' + product[i].product_id + ' not found';
-      }
-      if (result.number_in_stock < product[i].quantity) {
-        errorProduct = 'product id ' + product[i].quantity + " don't have enough stock";
-        break;
-      }
-      products.push(result);
+  let products = [];
+  let errorProduct;
+
+  for (let i = 0; i < product.length; i++) {
+    const result: any = await Product.findByPk(product[i].product_id);
+    if (!result) {
+      errorProduct = 'product id ' + product[i].product_id + ' not found';
     }
-    if (errorProduct) return res.status(400).send(errorProduct);
-
-    const order: any = await Order.create({ user_id: user_id, date: calcDate() }, { transaction: t });
-
-    for (let i = 0; i < product.length; i++) {
-      await Product.increment({ number_in_stock: -product[i].quantity }, { where: { product_id: product[i].product_id }, transaction: t });
-      await OrderItems.create({ product_id: product[i].product_id, order_id: order.order_id, quantity: product[i].quantity }, { transaction: t });
+    if (result.number_in_stock < product[i].quantity) {
+      errorProduct = 'product id ' + product[i].product_id + " don't have enough stock";
+      break;
     }
-    await t.commit();
-    res.send(order);
-  } catch (er) {
-    await t.rollback();
-    res.status(500).send(er);
+    products.push(result);
   }
+  if (errorProduct) return res.status(400).send(errorProduct);
+
+  const order: any = await Order.create({ user_id: user_id, date: calcDate() }, { transaction: t });
+
+  for (let i = 0; i < product.length; i++) {
+    await Product.increment({ number_in_stock: -product[i].quantity }, { where: { product_id: product[i].product_id }, transaction: t });
+    await OrderItems.create({ product_id: product[i].product_id, order_id: order.order_id, quantity: product[i].quantity }, { transaction: t });
+  }
+  await t.commit();
+  res.send(order);
 };
 
 const ordersByUser = async (req: any, res: Response) => {

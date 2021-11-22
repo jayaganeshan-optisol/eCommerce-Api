@@ -31,7 +31,6 @@ Order.init(
   {
     sequelize: db,
     modelName: 'order',
-    timestamps: false,
   }
 );
 Order.belongsToMany(Product, { through: OrderItems, foreignKey: 'order_id' });

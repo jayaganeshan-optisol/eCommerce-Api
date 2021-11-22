@@ -1,9 +1,9 @@
-import { Model, DataTypes, Optional } from 'sequelize';
-import { db } from '../config/db';
-import { Order } from './Orders';
-import { Product } from '../models/Products';
-import { Cart } from './Cart';
-import { WishList } from './WishList';
+import { Model, DataTypes, Optional } from "sequelize";
+import { db } from "../config/db";
+import { Order } from "./Orders";
+import { Product } from "../models/Products";
+import { Cart } from "./Cart";
+import { WishList } from "./WishList";
 
 interface IUser {
   user_id: number;
@@ -14,7 +14,7 @@ interface IUser {
   is_admin: boolean;
   shipping_address: string;
 }
-interface IUserAttributes extends Optional<IUser, 'user_id'> {}
+interface IUserAttributes extends Optional<IUser, "user_id"> {}
 export class User extends Model<IUser, IUserAttributes> {}
 
 User.init(
@@ -42,7 +42,7 @@ User.init(
       validate: {
         len: {
           args: [8, 55],
-          msg: 'string length not in range',
+          msg: "string length not in range",
         },
       },
     },
@@ -61,14 +61,17 @@ User.init(
   },
   {
     sequelize: db,
-    modelName: 'user',
-    timestamps: false,
+    modelName: "user",
   }
 );
-User.hasMany(Order, { foreignKey: 'user_id' });
+User.hasMany(Order, { foreignKey: "user_id" });
 
-User.belongsToMany(Product, { through: Cart, foreignKey: 'user_id', as: 'bag' });
-Product.belongsToMany(User, { through: Cart, foreignKey: 'product_id', as: 'bag' });
+User.belongsToMany(Product, { through: Cart, foreignKey: "user_id", as: "CartProducts" });
+Product.belongsToMany(User, {
+  through: Cart,
+  foreignKey: "product_id",
+  as: "CartProducts",
+});
 
-User.belongsToMany(Product, { through: WishList, foreignKey: 'user_id' });
-Product.belongsToMany(User, { through: WishList, foreignKey: 'product_id' });
+User.belongsToMany(Product, { through: WishList, as: "WishlistProducts", foreignKey: "user_id" });
+Product.belongsToMany(User, { through: WishList, as: "WishlistProducts", foreignKey: "product_id" });

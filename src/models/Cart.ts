@@ -1,5 +1,5 @@
-import { Model, DataTypes } from 'sequelize';
-import { db } from '../config/db';
+import { Model, DataTypes } from "sequelize";
+import { db } from "../config/db";
 
 export class Cart extends Model {
   public cart_id!: number;
@@ -14,7 +14,6 @@ Cart.init(
   },
   {
     sequelize: db,
-    modelName: 'cart',
-    timestamps: false,
+    modelName: "cart",
   }
 );

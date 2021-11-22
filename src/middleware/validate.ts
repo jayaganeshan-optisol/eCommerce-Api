@@ -1,18 +1,33 @@
-import { NextFunction, Request, Response } from 'express';
-import Joi, { object } from 'joi';
-
+import { NextFunction, Request, Response } from "express";
+import Joi from "joi";
+//user validation
+//Register Validation
+const password = new RegExp("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$");
 export const validateUser = (req: Request, res: Response, next: NextFunction) => {
   const schema = Joi.object({
     name: Joi.string().min(3).max(45).required(),
     email: Joi.string().min(8).max(45).required(),
-    password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{8,30}$')),
+    password: Joi.string().pattern(password).required().messages({ "string.pattern.base": "Invalid Password" }),
+    is_admin: Joi.boolean().optional(),
   });
   const { error } = schema.validate(req.body);
   if (error) {
-    res.status(400).send(error.details[0].message);
+    res.status(400).send({ error: error.details[0].message });
+  } else next();
+};
+//Login Validation
+export const ValidateLogin = (req: Request, res: Response, next: NextFunction) => {
+  const schema = Joi.object({
+    email: Joi.string().min(8).max(45).required(),
+    password: Joi.string().pattern(password).required().messages({ "string.pattern.base": "Invalid Password" }),
+  });
+  const { error } = schema.validate(req.body);
+  if (error) {
+    res.status(400).send({ error: error.details[0].message });
   } else next();
 };
 
+//Product Validation
 export const validateProduct = (req: Request, res: Response, next: NextFunction) => {
   const product = {
     product_name: req.body.product_name,
@@ -28,39 +43,11 @@ export const validateProduct = (req: Request, res: Response, next: NextFunction)
   });
   const { error } = schema.validate(product);
   if (error) {
-    return res.send(400).send(error.details[0].message);
+    return res.send(400).send({ error: error.details[0].message });
   }
   next();
 };
 
-// export const validateOrder = (req: Request, res: Response, next: NextFunction) => {
-//   const schema = Joi.object({
-//     user_id: Joi.number().integer().strict().required(),
-//     date: Joi.string().pattern(new RegExp('((?:19|20)\\d\\d)-(0?[1-9]|1[012])-([12][0-9]|3[01]|0?[1-9])')),
-//   });
-//   const { error } = schema.validate(req.body);
-//   if (error) {
-//     return { error };
-//   } else {
-//     return { error: undefined };
-//   }
-// };
-
-export const validateOrderItems = (req: Request, res: Response, next: NextFunction) => {
-  const schema = Joi.object({
-    product_id: Joi.number().integer().strict().required(),
-    order_id: Joi.number().integer().strict().required(),
-    quantity: Joi.number().integer().min(1).required(),
-  });
-  const { error } = schema.validate(req.body);
-  if (error) {
-    return { error };
-  } else {
-    return {
-      error: undefined,
-    };
-  }
-};
 //cart validation
 export const validateCart = (req: Request, res: Response, next: NextFunction) => {
   const cart = {
@@ -75,11 +62,11 @@ export const validateCart = (req: Request, res: Response, next: NextFunction) =>
   });
   const { error } = scheme.validate(cart);
   if (error) {
-    return res.status(400).send(error.details[0].message);
+    return res.status(400).send({ error: error.details[0].message });
   }
   next();
 };
-
+//wishlist Validation
 export const validateWishlist = (req: Request, res: Response, next: NextFunction) => {
   const wishlist = {
     user_id: req.body.tokenPayload.user_id,
@@ -91,11 +78,11 @@ export const validateWishlist = (req: Request, res: Response, next: NextFunction
   });
   const { error } = scheme.validate(wishlist);
   if (error) {
-    return res.status(400).send(error.details[0].message);
+    return res.status(400).send({ error: error.details[0].message });
   }
   next();
 };
-
+//Validate Order
 export const validateOrder = (req: Request, res: Response, next: NextFunction) => {
   const product = req.body.product;
 
@@ -107,7 +94,7 @@ export const validateOrder = (req: Request, res: Response, next: NextFunction) =
     });
     const { error } = schema.validate(p);
     if (error) {
-      errorMessage = error.details[0].message;
+      errorMessage = { error: error.details[0].message };
     }
   });
   if (errorMessage) return res.status(400).send(errorMessage);

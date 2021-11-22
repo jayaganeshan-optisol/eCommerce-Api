@@ -1,0 +1,584 @@
+openapi: 3.0.0
+info:
+  title: Sample API
+  description: ""
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+paths:
+  /register:
+    post:
+      tags:
+        - user
+      summary: "Returns a User object"
+      requestBody:
+        description: Create User
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUser"
+
+        required: true
+      responses:
+        "200":
+          description: Success
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+            
+  /login:
+    post:
+      tags:
+        - user
+      summary: Returns user's jwtToken
+      description: login User
+      operationId: loginUser
+      requestBody:
+        description: User Credentials
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginUser"
+
+        required: true
+      responses:
+        "200":
+          description: Success
+  /changepassword:
+    post:
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      summary: Change the users password
+      description: Changing password
+      operationId: changepwd
+      requestBody:
+        description: password Change
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePwd"
+        required: true
+      responses:
+        "200":
+          description: Success
+        "403":
+          description: Access Denied
+  /user/all:
+    get:
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      summary: Returns all users in array
+      description: Get all Users
+      operationId: getAllUsers
+
+      responses:
+        "200":
+          description: Success
+        "401":
+          description: Invalid Token
+        "403":
+          description: Access Denied
+
+  /update/shipping:
+    patch:
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      summary: Updating the User's Shipping address
+      description: Changing password
+      operationId: addShipping
+      requestBody:
+        description: add or update Shipping
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Shipping"
+        required: true
+      responses:
+        "200":
+          description: Success
+  #cart
+  /cart:
+    post:
+      tags:
+        - Cart
+      security:
+        - bearerAuth: []
+      summary: Return the cart object
+      description: ""
+      operationId: addCart
+
+      requestBody:
+        description: Product Details
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCart"
+        required: true
+      responses:
+        "200":
+          description: Success
+  /cart/view:
+    get:
+      tags:
+        - Cart
+      security:
+        - bearerAuth: []
+      summary: Return cart of user
+      description: ""
+      operationId: getCart
+
+      responses:
+        "200":
+          description: Success
+  /cart/update:
+    post:
+      tags:
+        - Cart
+      security:
+        - bearerAuth: []
+      summary: Return Updated cart object
+      description: ""
+      operationId: updateCart
+
+      requestBody:
+        description: Product Details
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCart"
+        required: true
+      responses:
+        "200":
+          description: Success
+  /cart/deleteAll:
+    delete:
+      tags:
+        - Cart
+      security:
+        - bearerAuth: []
+      summary: Delete cart of user
+      description: ""
+      operationId: deleteAllCart
+
+      responses:
+        "200":
+          description: Success
+  /cart/delete/{id}:
+    delete:
+      tags:
+        - Cart
+      security:
+        - bearerAuth: []
+      summary: Delete cart of user
+      description: ""
+      operationId: delete product by id
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: number
+          required: true
+      responses:
+        "200":
+          description: Success
+  #Wish-List
+  /wishlist:
+    get:
+      tags:
+        - Wish-List
+      summary: Returns products in wishlist
+      operationId: getWishlist
+      responses:
+        "200":
+          description: Success
+
+  /wishlist/add:
+    post:
+      tags:
+        - Wish-List
+      security:
+        - bearerAuth: []
+      summary: Return Wishlist object
+      description: ""
+      operationId: addWishlist
+      requestBody:
+        description: product Details
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWishlist"
+        required: true
+      responses:
+        "200":
+          description: Success
+  /Wishlist/remove/{id}:
+    delete:
+      tags:
+        - Wish-List
+      security:
+        - bearerAuth: []
+      summary: Remove Product by user
+      description: ""
+      operationId: deleteItemsWishlistUser
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: number
+          required: true
+      responses:
+        "200":
+          description: Success
+  /Wishlist/remove:
+    delete:
+      tags:
+        - Wish-List
+      security:
+        - bearerAuth: []
+      summary: Remove all Products
+      description: ""
+      operationId: deleteAllItemsWishlist
+      responses:
+        "200":
+          description: Success
+
+  #Products
+  /product/create:
+    post:
+      tags:
+        - Product
+      security:
+        - bearerAuth: []
+      summary: Return Product object
+      description: ""
+      operationId: CreateProduct
+      requestBody:
+        description: product Details
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProduct"
+        required: true
+      responses:
+        "200":
+          description: Success
+  /product/remove/{id}:
+    delete:
+      tags:
+        - Product
+      security:
+        - bearerAuth: []
+      summary: Remove Product by Admin
+      description: ""
+      operationId: DeleteproductByAdmin
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: number
+          required: true
+      responses:
+        "200":
+          description: Success
+  /product/update/{id}:
+    patch:
+      tags:
+        - Product
+      security:
+        - bearerAuth: []
+      summary: Update Product by Admin
+      description: ""
+      operationId: UpdateproductByAdmin
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: number
+          required: true
+      requestBody:
+        description: product Details
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProduct"
+        required: true
+      responses:
+        "200":
+          description: Success
+  /product/all:
+    get:
+      tags:
+        - Product
+      security:
+        - bearerAuth: []
+      summary: Return all Products in array
+      description: ""
+      operationId: getProducts
+      responses:
+        "200":
+          description: Success
+  /product/{id}:
+    get:
+      tags:
+        - Product
+      security:
+        - bearerAuth: []
+      summary: Return all Products in array
+      description: ""
+      operationId: getProductById
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: number
+          required: true
+
+      responses:
+        "200":
+          description: Success
+  #orders
+  /order:
+    post:
+      tags:
+        - Order
+      security:
+        - bearerAuth: []
+      summary: Return Order object
+      description: ""
+      operationId: createOrder
+      requestBody:
+        description: Order Details
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrder"
+        required: true
+      responses:
+        "200":
+          description: Success
+  /order/all:
+    get:
+      tags:
+        - Order
+      security:
+        - bearerAuth: []
+      summary: Return all orders in array by User
+      description: ""
+      operationId: get order by User
+      responses:
+        "200":
+          description: Success
+  /order/{id}:
+    delete:
+      tags:
+        - Order
+      security:
+        - bearerAuth: []
+      summary: Deletes order
+      description: ""
+      operationId: deleteProductById
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: number
+          required: true
+
+      responses:
+        "200":
+          description: Success
+
+#components
+components:
+  schemas:
+    CreateUser:
+      allOf:
+        - type: object
+          properties:
+            name:
+              type: string
+              example: jaiganeshan
+            email:
+              type: string
+              example: gjai456@gmail.com
+            password:
+              type: string
+              example: Mypassword@07
+    LoginUser:
+      allOf:
+        - type: object
+          properties:
+            email:
+              type: string
+              example: fakemail@gmail.com
+            password:
+              type: string
+              example: 123456789
+    ChangePwd:
+      allOf:
+        - type: object
+          properties:
+            oldPassword:
+              type: string
+              example: "123456789"
+            newPassword:
+              type: string
+              example: "12345678"
+    Shipping:
+      allOf:
+        - type: object
+          properties:
+            shipping_address:
+              type: string
+              example: "fake Address"
+    CreateCart:
+      allOf:
+        - type: object
+          properties:
+            product_id:
+              type: number
+              example: 1
+            quantity:
+              type: number
+              example: "1"
+    CreateWishlist:
+      allOf:
+        - type: object
+          properties:
+            product_id:
+              type: number
+              example: 1
+    CreateProduct:
+      allOf:
+        - type: object
+          properties:
+            product_name:
+              type: string
+              example: product 1
+            description:
+              type: string
+              example: Sample Description
+            unit_price:
+              type: number
+              example: 100
+            number_in_stock:
+              type: number
+              example: 500
+    CreateOrder:
+      allOf:
+        - type: object
+          properties:
+            product:
+              type: array
+              items:
+                $ref: "#/components/schemas/OrderItems"
+
+    OrderItems:
+      type: "object"
+      properties:
+        product_id:
+          type: number
+          example: 1
+        quantity:
+          type: number
+          example: 2
+    User:
+      allOf:
+        - type: object
+          properties:
+            user_id:
+              type: number
+              example: 1
+            name:
+              type: string
+              example: jaiganeshan
+            email:
+              type: string
+              example: gjai456@gmail.com
+            password:
+              type: string
+              example: jwttoken
+            shipping_address:
+              type: string
+              example: null
+            createdAt:
+              type: string
+              example: time zone
+            updatedAt:
+               type: string
+               example: time zone
+    Error:
+      type: object
+      required:
+        - statusCode
+        - message
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+  responses:
+    UserResponse:
+      description: ''
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              user:
+                $ref: '#/components/schemas/User'
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  statusCode:
+                    type: number
+                    example: 404
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  statusCode:
+                    type: number
+                    example: 401
+    BadRequest:
+      description: BadRequest
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  statusCode:
+                    type: number
+                    example: 400
+            
+              
+
+  #security Schemes
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+#response Schemes

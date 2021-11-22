@@ -1,17 +1,18 @@
-import { Router } from 'express';
-import auth from '../middleware/auth';
-import admin from '../middleware/admin';
-import { productController } from '../controllers/product.controller';
-import { validateProduct } from '../middleware/validate';
+import { Router } from "express";
+import auth from "../middleware/auth";
+import admin from "../middleware/admin";
+import { productController } from "../controllers/product.controller";
+import { validateProductUpdate, validateProduct } from "../middleware/validation/productValidation";
+import { validateParamsId } from "../middleware/validation/paramsValaditor";
 
 export const router: Router = Router();
 //Post a product by admin
-router.post('/product/post', [auth, admin, validateProduct], productController.createProduct);
+router.post("/create", [validateProduct, auth, admin], productController.createProduct);
 //Delete Product by admin
-router.delete('/product/destroy/:id', [auth, admin], productController.deleteProduct);
+router.delete("/remove/:id", [validateParamsId, auth, admin], productController.deleteProduct);
 //update product by admin
-router.patch('/product/update/:id', [auth, admin], productController.updateProduct);
+router.patch("/update/:id", [validateParamsId, validateProductUpdate, auth, admin], productController.updateProduct);
 //get all Products
-router.get('/products', auth, productController.getAllProduct);
+router.get("/all", auth, productController.getAllProduct);
 //get product by product Id
-router.get('/product/:id', productController.getProductById);
+router.get("/:id", [validateParamsId, auth], productController.getProductById);
