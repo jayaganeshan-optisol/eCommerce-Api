@@ -1,14 +1,14 @@
-import { Model, DataTypes, Optional } from 'sequelize';
-import { db } from '../config/db';
-import { OrderItems } from './Order_items';
-import { Product } from './Products';
+import { Model, DataTypes, Optional } from "sequelize";
+import { db } from "../config/db";
+import { OrderItems } from "./Order_items";
+import { Product } from "./Products";
 
-interface IOrder {
+export interface IOrder {
   user_id: number;
   order_id: number;
   date: string;
 }
-interface IOrderAttributes extends Optional<IOrder, 'order_id'> {}
+export interface IOrderAttributes extends Optional<IOrder, "order_id"> {}
 export class Order extends Model<IOrder, IOrderAttributes> {}
 
 Order.init(
@@ -30,11 +30,11 @@ Order.init(
   },
   {
     sequelize: db,
-    modelName: 'order',
+    modelName: "order",
   }
 );
-Order.belongsToMany(Product, { through: OrderItems, foreignKey: 'order_id' });
-Product.belongsToMany(Order, { through: OrderItems, foreignKey: 'product_id' });
+Order.belongsToMany(Product, { through: OrderItems, foreignKey: "order_id" });
+Product.belongsToMany(Order, { through: OrderItems, foreignKey: "product_id" });
 
 export const calcDate = () => {
   const date = new Date();

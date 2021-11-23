@@ -1,27 +1,23 @@
-import { Router, Request, Response } from "express";
-import { exist } from "joi";
-import { forEach } from "lodash";
-import { Op } from "sequelize";
-import { Cart } from "../models/Cart";
-import { Product } from "../models/Products";
-import { User } from "../models/User";
+import { Request, Response } from "express";
+import { createCart, deleteCartByUserId, getProductsFromCart } from "../dao/carts.dao";
+import { getUserByID } from "../dao/user.dao.";
 //creation
-const createCart = async (req: Request, res: Response) => {
+const addCart = async (req: Request, res: Response) => {
   const { product_id, quantity } = req.body;
   const { user_id } = req.body.tokenPayload;
-  const exists = await Cart.findOne({ where: { user_id, product_id } });
+  const exists = await getProductsFromCart(user_id, product_id);
   if (exists) {
     await exists.update({ quantity });
-    res.send("quantity Updated");
+    return res.send("quantity Updated");
   }
-  const cart = await Cart.create({ user_id, product_id, quantity });
-  res.send(cart);
+  const cart = await createCart(user_id, product_id, quantity);
+  return res.send(cart);
 };
 
 const getCart = async (req: Request, res: Response) => {
   const { user_id } = req.body.tokenPayload;
 
-  const user: any = await User.findOne({ where: { user_id } });
+  const user: any = await getUserByID(user_id);
   const bag = await user.getCartProducts();
   bag.forEach((b: any) => console.log(b.product_name, b.product_id, b.cart.quantity));
   res.send(bag);
@@ -30,9 +26,9 @@ const getCart = async (req: Request, res: Response) => {
 const updateCart = async (req: Request, res: Response) => {
   const { product_id, quantity } = req.body;
   const { user_id } = req.body.tokenPayload;
-  const cart = await Cart.findOne({ where: { user_id } });
+  const cart = await getProductsFromCart(user_id, product_id);
   if (cart) {
-    cart.update({ quantity }, { where: { product_id } });
+    cart.update({ quantity });
     await cart.save();
     res.status(200).send("updated successfully");
   } else {
@@ -43,7 +39,7 @@ const updateCart = async (req: Request, res: Response) => {
 const deleteProductById = async (req: Request, res: Response) => {
   const { user_id } = req.body.tokenPayload;
   const product_id = req.params.id;
-  const cart = await Cart.findOne({ where: { [Op.and]: [{ user_id }, { product_id }] } });
+  const cart = await getProductsFromCart(user_id, parseInt(product_id));
 
   if (cart) {
     cart.destroy();
@@ -56,12 +52,13 @@ const deleteProductById = async (req: Request, res: Response) => {
 
 const deleteAll = async (req: Request, res: Response) => {
   const { user_id } = req.body.tokenPayload;
-  const cart = await Cart.destroy({ where: { user_id } });
+  const cart = await deleteCartByUserId(user_id);
   if (cart > 0) return res.send("Removed successfully");
+  return res.status(400).send("No Products to Remove");
 };
 
 export const cartController = {
-  createCart,
+  addCart,
   getCart,
   updateCart,
   deleteProductById,

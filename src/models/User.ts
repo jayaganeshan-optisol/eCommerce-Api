@@ -4,14 +4,19 @@ import { Order } from "./Orders";
 import { Product } from "../models/Products";
 import { Cart } from "./Cart";
 import { WishList } from "./WishList";
-
+import { hashPassword } from "../services/passwordHandling";
+export enum AccountType {
+  admin = 1,
+  seller,
+  buyer,
+  both,
+}
 interface IUser {
   user_id: number;
   name: string;
   email: string;
   password: string;
-  is_premium: boolean;
-  is_admin: boolean;
+  role: AccountType;
   shipping_address: string;
 }
 interface IUserAttributes extends Optional<IUser, "user_id"> {}
@@ -46,13 +51,10 @@ User.init(
         },
       },
     },
-    is_premium: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    is_admin: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
+    role: {
+      type: DataTypes.ENUM,
+      values: ["admin", "seller", "buyer", "both"],
+      defaultValue: "buyer",
     },
     shipping_address: {
       type: DataTypes.STRING,
@@ -64,6 +66,12 @@ User.init(
     modelName: "user",
   }
 );
+
+User.beforeCreate(async (user: any, options) => {
+  const hashedPassword = hashPassword(user.password);
+  user.password = hashedPassword;
+});
+
 User.hasMany(Order, { foreignKey: "user_id" });
 
 User.belongsToMany(Product, { through: Cart, foreignKey: "user_id", as: "CartProducts" });

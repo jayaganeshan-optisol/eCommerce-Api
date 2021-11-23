@@ -1,0 +1,10 @@
+export const onlyBuyer = ["buyer"];
+export const onlySeller = ["buyer"];
+export const both = ["both"];
+export const onlyAdmin = ["admin"];
+export const Buyer_Both = ["buyer", "both"];
+export const Seller_Both = ["seller", "both"];
+export const Admin_Buyer_Both = ["admin", "buyer", "both"];
+export const Admin_Seller_Both = ["admin", "seller", "both"];
+export const Seller_Buyer_Both = ["seller", "buyer", "both"];
+export const all = ["admin", "seller", "buyer", "both"];
