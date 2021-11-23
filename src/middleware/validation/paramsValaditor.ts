@@ -3,7 +3,6 @@ import Joi from "joi";
 
 export const validateParamsId = (req: Request, res: Response, next: NextFunction) => {
   const id = req.params;
-  console.log(id);
   const schema = Joi.object({
     id: Joi.number().integer().required(),
   });

@@ -1,10 +1,10 @@
-import { Model, DataTypes } from 'sequelize';
-import { db } from '../config/db';
+import { Model, DataTypes } from "sequelize";
+import { db } from "../config/db";
 
 export interface IOrderItems {
   product_id: number;
-  order_id: string;
-  quantity: string;
+  order_id: number;
+  quantity: number;
 }
 export class OrderItems extends Model<IOrderItems> {}
 
@@ -27,6 +27,6 @@ OrderItems.init(
   },
   {
     sequelize: db,
-    modelName: 'order_item',
+    modelName: "order_item",
   }
 );

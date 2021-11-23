@@ -1,17 +1,18 @@
 import { Router } from "express";
 import { wishlistController } from "../controllers/wishlist.controller";
-
-export const router = Router();
 import auth from "../middleware/auth";
-import { validateWishlist } from "../middleware/validate";
+import { validateParamsId } from "../middleware/validation/paramsValaditor";
+import { validateWishlist } from "../middleware/validation/wishlistValidation";
+import { Buyer_Both } from "../services/Roles";
+export const router = Router();
 
 //get all products in wishlist by user
-router.get("/", auth, wishlistController.getAllById);
+router.get("/", auth(Buyer_Both), wishlistController.getAllById);
 
 //add product to wishlist
-router.post("/add", [auth, validateWishlist], wishlistController.add);
+router.post("/add", auth(Buyer_Both), validateWishlist, wishlistController.addWishlist);
 //remove a product from wishlist
-router.delete("/remove/:id", auth, wishlistController.removeById);
+router.delete("/remove/:id", validateParamsId, auth(Buyer_Both), wishlistController.removeById);
 //remove all products from wishlist
 
-router.delete("/remove", auth, wishlistController.removeAll);
+router.delete("/remove", auth(Buyer_Both), wishlistController.removeAll);
