@@ -1,17 +1,23 @@
 import { verify } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
-import { getToken } from "../services/generateToken";
+import { DecodedToken, getToken, verifyToken } from "../services/tokenHandling";
 
-const auth = (req: Request, res: Response, next: NextFunction) => {
-  const token = getToken(req);
-  if (!token) return res.status(401).send("Access denied. No token provided.");
-
-  try {
-    const decoded = verify(token, process.env.SEC_HASH as string) as object;
-    req.body.tokenPayload = decoded;
-    next();
-  } catch (ex) {
-    res.status(401).send("Invalid token.");
-  }
+const auth = (roles: any) => {
+  return [
+    // authorize based on user role
+    (req: Request, res: Response, next: NextFunction) => {
+      const token: any = getToken(req);
+      if (!token) return res.status(400).send({ error: "NO token Provided" });
+      console.log(token);
+      const decode: any = verifyToken(token);
+      if (roles.length && !roles.includes(decode.role)) {
+        // user's role is not authorized
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      req.body.tokenPayload = decode;
+      next();
+    },
+  ];
 };
+
 export default auth;

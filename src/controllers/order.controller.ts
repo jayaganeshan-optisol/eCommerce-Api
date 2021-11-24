@@ -1,69 +1,107 @@
-import { Response, Request } from 'express';
-import { db } from '../config/db';
-import { calcDate, Order } from '../models/Orders';
-import { OrderItems } from '../models/Order_items';
-import { Product } from '../models/Products';
-import { User } from '../models/User';
-
+import { Response, Request } from "express";
+import { db } from "../config/db";
+import { createOrderItems, getOrderItemsById } from "../dao/orderItems.dao";
+import { getAllOrders, placeOrder, cancelOrder, getOrderById } from "../dao/orders.dao.";
+import { getProductById, changeStockInProduct } from "../dao/products.dao";
+import { getUserByID } from "../dao/user.dao.";
+import { calcDate } from "../models/Orders";
+//Creating Order
 const createOrder = async (req: Request, res: Response) => {
-  const t = await db.transaction();
   const { user_id } = req.body.tokenPayload;
   const { product } = req.body;
-
-  const user: any = await User.findByPk(user_id);
-  if (!user) return res.status(400).send('user not found');
-  if (user.shipping_address === null) return res.status(400).send('no shipping address');
+  const t = await db.transaction();
+  const user: any = await getUserByID(user_id);
+  if (!user) return res.status(404).send("No user found");
+  if (user.shipping_address === null) return res.status(400).send("No shipping Address");
 
   let products = [];
   let errorProduct;
 
   for (let i = 0; i < product.length; i++) {
-    const result: any = await Product.findByPk(product[i].product_id);
+    const result: any = await getProductById(product[i].product_id);
     if (!result) {
-      errorProduct = 'product id ' + product[i].product_id + ' not found';
+      errorProduct = "product id " + product[i].product_id + " not found";
     }
     if (result.number_in_stock < product[i].quantity) {
-      errorProduct = 'product id ' + product[i].product_id + " don't have enough stock";
+      errorProduct = "product id " + product[i].product_id + " don't have enough stock";
       break;
     }
     products.push(result);
   }
-  if (errorProduct) return res.status(400).send(errorProduct);
+  if (errorProduct) return { status: 404, message: errorProduct };
 
-  const order: any = await Order.create({ user_id: user_id, date: calcDate() }, { transaction: t });
+  const order: any = await placeOrder({ user_id: user_id, date: calcDate() }, t);
 
   for (let i = 0; i < product.length; i++) {
-    await Product.increment({ number_in_stock: -product[i].quantity }, { where: { product_id: product[i].product_id }, transaction: t });
-    await OrderItems.create({ product_id: product[i].product_id, order_id: order.order_id, quantity: product[i].quantity }, { transaction: t });
+    await changeStockInProduct({ quantity: product[i].quantity, product_id: product[i].product_id }, "dec", t);
+    await createOrderItems({ product_id: product[i].product_id, order_id: order.order_id, quantity: product[i].quantity }, t);
   }
   await t.commit();
-  res.send(order);
+  return res.status(200).send(order);
 };
-
-const ordersByUser = async (req: any, res: Response) => {
-  const order_items = await User.findAll({ include: { model: Order } });
-  res.send(order_items);
+//getting all Orders by admin
+const ordersByUser = async (req: Request, res: Response) => {
+  const result = await getAllOrders();
+  res.status(200).send(result);
 };
-
-const cancelOrder = async (req: Request, res: Response) => {
+//Cancelling Order
+const deleteOrder = async (req: Request, res: Response) => {
+  const { user_id } = req.body.tokenPayload;
+  const { id: order_id } = req.params;
   const t = await db.transaction();
-  const orderItems = await OrderItems.findAll({ where: { order_id: req.params.id } });
-  if (orderItems.length == 0) {
-    res.send('no orders');
-  } else {
-    orderItems.forEach(async (order: any) => {
-      await Product.increment({ number_in_stock: order.quantity }, { where: { product_id: order.product_id }, transaction: t });
-      await order.destroy({ transaction: t });
+  const orderItems = await getOrderItemsById(parseInt(order_id));
+  if (orderItems.length == 0) return res.status(404).send("No Orders");
+  else {
+    orderItems.forEach(async (orderItem: any) => {
+      await changeStockInProduct({ quantity: orderItem.quantity, product_id: orderItem.product_id }, "inc", t);
     });
-    const order = await Order.findOne({ where: { order_id: req.params.id } });
+    const order = await getOrderById(parseInt(order_id));
     if (!order) {
-      res.send('no such order');
+      return res.status(404).send("No Orders");
     } else {
       await order?.destroy({ transaction: t });
       await t.commit();
-      res.send('order cancelled');
+      return res.status(200).send("Order Cancelled");
     }
   }
 };
+//Order directly form cart
+const orderCart = async (req: Request, res: Response) => {
+  const { user_id } = req.body.tokenPayload;
+  const user: any = await getUserByID(user_id);
+  const cart = await user.getCartProducts();
+  let product: any = [];
+  cart.forEach((prod: any) => {
+    const temp = { product_id: prod.product_id, quantity: prod.cart.quantity };
+    product.push(temp);
+  });
+  if (product.length === 0) return res.status(400).send("No products in cart");
+  const t = await db.transaction();
+  if (!user) return res.status(404).send("No user found");
+  if (user.shipping_address === null) return res.status(400).send("No shipping Address");
 
-export const orderController = { createOrder, ordersByUser, cancelOrder };
+  let products = [];
+  let errorProduct;
+
+  for (let i = 0; i < product.length; i++) {
+    const result: any = await getProductById(product[i].product_id);
+    if (!result) {
+      errorProduct = "product id " + product[i].product_id + " not found";
+    }
+    if (result.number_in_stock < product[i].quantity) {
+      errorProduct = "product id " + product[i].product_id + " don't have enough stock";
+      break;
+    }
+    products.push(result);
+  }
+  if (errorProduct) return res.status(400).send({ error: errorProduct });
+  const order: any = await placeOrder({ user_id: user_id, date: calcDate() }, t);
+
+  for (let i = 0; i < product.length; i++) {
+    await changeStockInProduct({ quantity: product[i].quantity, product_id: product[i].product_id }, "dec", t);
+    await createOrderItems({ product_id: product[i].product_id, order_id: order.order_id, quantity: product[i].quantity }, t);
+  }
+  await t.commit();
+  res.status(200).send(order);
+};
+export const orderController = { createOrder, ordersByUser, deleteOrder, orderCart };

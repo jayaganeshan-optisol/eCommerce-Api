@@ -7,7 +7,7 @@ export const validateRegister = (req: Request, res: Response, next: NextFunction
     name: Joi.string().min(3).max(45).required(),
     email: Joi.string().min(8).max(45).required(),
     password: Joi.string().pattern(password).required().messages({ "string.pattern.base": "Invalid Password" }),
-    is_admin: Joi.boolean().optional(),
+    role: Joi.string().valid("seller", "buyer", "both", "admin").optional(),
   });
   const { error } = schema.validate(req.body);
   if (error) {
