@@ -35,7 +35,7 @@ const login = async (req: Request, res: Response) => {
   let user: any;
   user = await getUserByMail(req.body.email);
   if (!user) {
-    return { statusCode: 404, message: { error: "No users Found" } };
+    return res.status(404).send({ error: "Email Not found in db" });
   } else {
     const { password } = user;
     const pass = comparePassword(password, req.body.password);

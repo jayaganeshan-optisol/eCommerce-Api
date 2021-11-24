@@ -29,4 +29,4 @@ app.use("/product", productRouter);
 app.use("/cart", cartRouter);
 app.use("/wishlist", ListRouter);
 app.use(error);
-db.authenticate().then(() => console.log("connected to DB"));
+db.sync({ force: true }).then(() => console.log("connected to DB"));

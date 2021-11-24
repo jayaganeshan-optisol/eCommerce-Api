@@ -6,7 +6,7 @@ export const validateRegister = (req: Request, res: Response, next: NextFunction
   const schema = Joi.object({
     name: Joi.string().min(3).max(45).required(),
     email: Joi.string().min(8).max(45).required(),
-    password: Joi.string().pattern(password).required().messages({ "string.pattern.base": "Invalid Password" }),
+    password: Joi.string().pattern(password).required().messages({ "string.pattern.base": "Password constrain failed" }),
     role: Joi.string().valid("seller", "buyer", "both", "admin").optional(),
   });
   const { error } = schema.validate(req.body);
@@ -18,7 +18,7 @@ export const validateRegister = (req: Request, res: Response, next: NextFunction
 export const ValidateLogin = (req: Request, res: Response, next: NextFunction) => {
   const schema = Joi.object({
     email: Joi.string().min(8).max(45).required(),
-    password: Joi.string().pattern(password).required().messages({ "string.pattern.base": "Invalid Password" }),
+    password: Joi.string().pattern(password).required().messages({ "string.pattern.base": "Password Constrain failed" }),
   });
   const { error } = schema.validate(req.body);
   if (error) {

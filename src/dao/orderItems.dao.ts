@@ -10,3 +10,8 @@ export const getOrderItemsById = async (order_id: number) => {
   const order_items = await OrderItems.findAll({ where: { order_id } });
   return order_items;
 };
+
+export const getOrderItemsByProductId = async (product_id: number) => {
+  const order_items = await OrderItems.findOne({ where: { product_id } });
+  return order_items;
+};

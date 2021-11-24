@@ -1,31 +1,37 @@
 import { Response, Request } from "express";
-import { OrderItems } from "../models/Order_items";
-import { Product } from "../models/Products";
+import { getOrderItemsByProductId } from "../dao/orderItems.dao";
+import { createProduct, getAllProducts, getProductById } from "../dao/products.dao";
+import { getUserByID } from "../dao/user.dao.";
 
-const createProduct = async (req: Request, res: Response) => {
+const addProduct = async (req: Request, res: Response) => {
+  const { user_id } = req.body.tokenPayload;
+  const user: any = await getUserByID(user_id);
   const { product_name, description, unit_price, number_in_stock } = req.body;
-  const product = await Product.create({ product_name, description, unit_price, number_in_stock });
+  const product = await createProduct(product_name, description, unit_price, number_in_stock, user.name);
   res.send(product);
 };
 
 const deleteProduct = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const order_item = await OrderItems.findOne({ where: { product_id: id } });
+  const { user_id } = req.body.tokenPayload;
+  const user: any = await getUserByID(user_id);
+  const order_item = await getOrderItemsByProductId(parseInt(id));
   if (order_item) {
-    res.send("cannot delete the order Item ");
+    res.send("cannot delete the product of Order Item ");
   } else {
-    const product = await Product.findByPk(id);
+    const product: any = await getProductById(parseInt(id));
     if (!product) {
       res.status(404).send("no such product");
     } else {
-      const result = await product?.destroy();
+      if (product.seller_name !== user.name) res.status(400).send({ error: "Invalid seller " });
+      await product?.destroy();
       res.send({ message: "Product Removed Successfully" });
     }
   }
 };
 const updateProduct = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const product = await Product.findByPk(id);
+  const product = await getProductById(parseInt(id));
   if (!product) {
     res.send("No product available");
   } else {
@@ -33,20 +39,20 @@ const updateProduct = async (req: Request, res: Response) => {
     res.send(result);
   }
 };
-const getAllProduct = async (req: Request, res: Response) => {
-  const products = await Product.findAll();
+const findAllProduct = async (req: Request, res: Response) => {
+  const products = await getAllProducts();
   res.send(products);
 };
-const getProductById = async (req: Request, res: Response) => {
+const findProductById = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const product = await Product.findByPk(id);
+  const product = await getProductById(parseInt(id));
   if (product) return res.send(product);
   return res.status(404).send({ error: "No such Product" });
 };
 export const productController = {
-  createProduct,
+  addProduct,
   deleteProduct,
   updateProduct,
-  getAllProduct,
-  getProductById,
+  findAllProduct,
+  findProductById,
 };

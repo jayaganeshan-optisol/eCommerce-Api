@@ -7,12 +7,12 @@ import { Admin_Seller_Both, all } from "../services/Roles";
 
 export const router: Router = Router();
 //Post a product by admin
-router.post("/create", validateProduct, auth(Admin_Seller_Both), productController.createProduct);
+router.post("/create", validateProduct, auth(Admin_Seller_Both), productController.addProduct);
 //Delete Product by admin
 router.delete("/remove/:id", auth(Admin_Seller_Both), productController.deleteProduct);
 //update product by admin
 router.patch("/update/:id", validateParamsId, validateProductUpdate, auth(Admin_Seller_Both), productController.updateProduct);
 //get all Products
-router.get("/all", auth(all), productController.getAllProduct);
+router.get("/all", auth(all), productController.findAllProduct);
 //get product by product Id
-router.get("/:id", validateParamsId, auth(all), productController.getProductById);
+router.get("/:id", validateParamsId, auth(all), productController.findProductById);

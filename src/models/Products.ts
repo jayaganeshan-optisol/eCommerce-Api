@@ -7,7 +7,7 @@ export interface IProduct {
   description: string;
   unit_price: number;
   number_in_stock: number;
-  // seller_name: string;
+  seller_name: string;
 }
 interface IProductsAttributes extends Optional<IProduct, "product_id"> {}
 export class Product extends Model<IProduct, IProductsAttributes> {}
@@ -35,10 +35,10 @@ Product.init(
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
     },
-    // seller_name: {
-    //   type: DataTypes.STRING,
-    //   allowNull: false,
-    // },
+    seller_name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   },
   {
     sequelize: db,
