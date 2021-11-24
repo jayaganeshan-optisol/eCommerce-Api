@@ -1,5 +1,5 @@
 import { AccountType, User } from "../models/User";
-import { generateToken } from "../services/generateToken";
+import { generateToken } from "../services/tokenHandling";
 import { comparePassword, hashPassword } from "../services/passwordHandling";
 
 interface IUser {

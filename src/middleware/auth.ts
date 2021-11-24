@@ -1,6 +1,6 @@
 import { verify } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
-import { DecodedToken, getToken, verifyToken } from "../services/generateToken";
+import { DecodedToken, getToken, verifyToken } from "../services/tokenHandling";
 
 const auth = (roles: any) => {
   return [
@@ -12,7 +12,7 @@ const auth = (roles: any) => {
       const decode: any = verifyToken(token);
       if (roles.length && !roles.includes(decode.role)) {
         // user's role is not authorized
-        return res.status(401).json({ message: "Unauthorized" });
+        return res.status(401).json({ error: "Unauthorized" });
       }
       req.body.tokenPayload = decode;
       next();
