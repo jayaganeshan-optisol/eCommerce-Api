@@ -1,10 +1,11 @@
-import { Response, Request } from "express";
+import { Response, Request, response } from "express";
 import { db } from "../config/db";
 import { createOrderItems, getOrderItemsById } from "../dao/orderItems.dao";
-import { getAllOrders, placeOrder, cancelOrder, getOrderById } from "../dao/orders.dao.";
+import { getAllOrders, placeOrder, cancelOrder, getOrderById, getProductsInOrder, getProductsInOrderItems } from "../dao/orders.dao.";
 import { getProductById, changeStockInProduct } from "../dao/products.dao";
 import { getUserByID } from "../dao/user.dao.";
-import { calcDate } from "../models/Orders";
+import { calcDate, Order } from "../models/Orders";
+import { Product } from "../models/Products";
 //Creating Order
 const createOrder = async (req: Request, res: Response) => {
   const { user_id } = req.body.tokenPayload;
@@ -104,4 +105,31 @@ const orderCart = async (req: Request, res: Response) => {
   await t.commit();
   res.status(200).send(order);
 };
-export const orderController = { createOrder, ordersByUser, deleteOrder, orderCart };
+const findOrderByUser = async (req: Request, res: Response) => {
+  const { user_id } = req.body.tokenPayload;
+  const orders: any = await getProductsInOrder(user_id);
+  // return res.send(orders);
+  let result: any = [];
+  orders.forEach((order: any) => {
+    let sum: number = 0;
+    order.products.forEach((product: any) => {
+      const temp = product.unit_price * product.order_item.quantity;
+      sum = sum + temp;
+    });
+    const orderDetails = { order_id: order.order_id, date: order.date, total_price: sum };
+    result.push(orderDetails);
+  });
+  res.send(result);
+};
+const findOrderItemsByUser = async (req: Request, res: Response) => {
+  const { user_id } = req.body.tokenPayload;
+  const { id } = req.params;
+  const order: any = await getProductsInOrderItems(parseInt(id), user_id);
+  const orderItems: any = [];
+  order.products.forEach((product: any) => {
+    const temp = { product_id: product.product_id, product_name: product.product_id, quantity: product.order_item.quantity, unit_price: product.unit_price };
+    orderItems.push(temp);
+  });
+  res.send(orderItems);
+};
+export const orderController = { createOrder, ordersByUser, deleteOrder, orderCart, findOrderByUser, findOrderItemsByUser };

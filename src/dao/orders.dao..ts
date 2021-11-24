@@ -44,3 +44,12 @@ export const getOrderById = async (order_id: number) => {
   const result = await Order.findOne({ where: { order_id } });
   return result;
 };
+export const getProductsInOrderItems = async (order_id: number, user_id: number) => {
+  const result = Order.findOne({ where: { order_id, user_id }, include: { model: Product } });
+  return result;
+};
+
+export const getProductsInOrder = async (user_id: number) => {
+  const result = Order.findAll({ where: { user_id }, include: { model: Product } });
+  return result;
+};
