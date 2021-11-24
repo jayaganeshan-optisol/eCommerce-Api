@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { addShipping, getUserByMail, getAllUsers, loginUser, passwordChange, CreateUser, getUserByID } from "../dao/user.dao.";
 import { User } from "../models/User";
-import { generateToken } from "../services/generateToken";
+import { generateToken } from "../services/tokenHandling";
 import { comparePassword, hashPassword } from "../services/passwordHandling";
 const Verifier = require("email-verifier");
 

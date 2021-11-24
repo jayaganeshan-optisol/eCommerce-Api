@@ -19,4 +19,4 @@ router.patch("/update", auth(Buyer_Both), validateCart, cartController.updateCar
 router.delete("/delete/:id", validateParamsId, auth(Buyer_Both), cartController.deleteProductById);
 
 //delete all item in the cart
-router.delete("/deleteAll", auth(Buyer_Both), cartController.deleteAll);
+router.delete("/all/delete", auth(Buyer_Both), cartController.deleteAll);

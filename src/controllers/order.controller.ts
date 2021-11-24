@@ -71,9 +71,9 @@ const orderCart = async (req: Request, res: Response) => {
   const user: any = await getUserByID(user_id);
   const cart = await user.getCartProducts();
   let product: any = [];
-  cart.forEach((product: any) => {
-    const temp = { product_id: product.product_id, quantity: product.cart.quantity };
-    products.push(temp);
+  cart.forEach((prod: any) => {
+    const temp = { product_id: prod.product_id, quantity: prod.cart.quantity };
+    product.push(temp);
   });
   if (product.length === 0) return res.status(400).send("No products in cart");
   const t = await db.transaction();
@@ -95,7 +95,6 @@ const orderCart = async (req: Request, res: Response) => {
     products.push(result);
   }
   if (errorProduct) return res.status(400).send({ error: errorProduct });
-
   const order: any = await placeOrder({ user_id: user_id, date: calcDate() }, t);
 
   for (let i = 0; i < product.length; i++) {
