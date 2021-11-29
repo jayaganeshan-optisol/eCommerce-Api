@@ -1,12 +1,12 @@
 import { Model, DataTypes, Optional } from "sequelize";
-import { db } from "../config/db";
+import { db } from "../services/db";
 import { Order } from "./Orders";
 import { Product } from "../models/Products";
 import { Cart } from "./Cart";
 import { WishList } from "./WishList";
 import { hashPassword } from "../services/passwordHandling";
 export enum AccountType {
-  admin = 1,
+  admin,
   seller,
   buyer,
   both,

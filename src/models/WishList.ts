@@ -1,5 +1,5 @@
 import { Model, DataTypes, Optional } from 'sequelize';
-import { db } from '../config/db';
+import { db } from '../services/db';
 
 export class WishList extends Model {
   public product_id!: number;

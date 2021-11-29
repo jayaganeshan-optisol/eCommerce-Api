@@ -1,5 +1,5 @@
 import { Model, DataTypes, Optional } from "sequelize";
-import { db } from "../config/db";
+import { db } from "../services/db";
 import { OrderItems } from "./Order_items";
 import { Product } from "./Products";
 

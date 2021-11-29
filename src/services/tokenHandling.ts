@@ -1,6 +1,7 @@
 import { sign, verify } from "jsonwebtoken";
 import { Request } from "express";
 import { AccountType } from "../models/User";
+import config from "config";
 export interface DecodedToken {
   user_id: string;
   role: AccountType;
@@ -8,7 +9,7 @@ export interface DecodedToken {
   exp: string;
 }
 export const generateToken = (user: object): string => {
-  const token = sign(user, process.env.SEC_HASH as string, { expiresIn: "3d" });
+  const token = sign(user, config.get("SEC_HASH") as string, { expiresIn: "3d" });
   return token;
 };
 export function getToken(req: Request) {
@@ -19,6 +20,7 @@ export function getToken(req: Request) {
 }
 
 export const verifyToken = (token: string) => {
-  const decoded = verify(token, process.env.SEC_HASH as string);
-  return decoded;
+  const decoded = verify(token, config.get("SEC_HASH") as string);
+  if (decoded) return decoded;
+  return null;
 };

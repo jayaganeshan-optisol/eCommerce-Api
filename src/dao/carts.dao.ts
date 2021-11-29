@@ -1,4 +1,5 @@
 import { Cart } from "../models/Cart";
+
 export const createCart = async (user_id: number, product_id: number, quantity: number) => {
   const result = await Cart.create({ user_id, product_id, quantity });
   return result;

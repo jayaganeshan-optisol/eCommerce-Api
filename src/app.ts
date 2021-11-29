@@ -1,6 +1,6 @@
 import express, { Application } from "express";
 require("express-async-errors");
-import { db } from "./config/db";
+import { db } from "./services/db";
 import { router as authRouter } from "./routes/user";
 import { router as orderRouter } from "./routes/orders";
 import { router as productRouter } from "./routes/product";
@@ -30,3 +30,6 @@ app.use("/cart", cartRouter);
 app.use("/wishlist", ListRouter);
 app.use(error);
 db.authenticate().then(() => console.log("connected to DB"));
+console.log(app.get("env"));
+
+export default app;

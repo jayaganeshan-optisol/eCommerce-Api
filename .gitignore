@@ -1,5 +1,9 @@
 # dependencies
 /node_modules
-
+# env variables
+/config
+.env
 # testing
 /coverage
+
+.vscode

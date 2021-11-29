@@ -7,17 +7,17 @@ import { validateOrder } from "../middleware/validation/orderValidation";
 
 export const router: Router = Router();
 //create order by user
-router.post("/", validateOrder, auth(Buyer_Both), orderController.createOrder);
+router.post("/", auth(Buyer_Both), validateOrder, orderController.createOrder);
 //find orders by User
 router.get("/all", auth(onlyAdmin), orderController.ordersByUser);
 
 //delete Order
-router.delete("/:id", validateParamsId, auth(Buyer_Both), orderController.deleteOrder);
+router.delete("/cancel/:id", validateParamsId, auth(Buyer_Both), orderController.deleteOrder);
 //place order by cart
 router.post("/by/cart", auth(Buyer_Both), orderController.orderCart);
 
 //get orders by user
-router.get("/", auth(Buyer_Both), orderController.findOrderByUser);
+router.get("/user", auth(Buyer_Both), orderController.findOrderByUser);
 
 //get order Items by User
-router.get("/:id", auth(Buyer_Both), validateParamsId, orderController.findOrderItemsByUser);
+router.get("/find/:id", auth(Buyer_Both), validateParamsId, orderController.findOrderItemsByUser);

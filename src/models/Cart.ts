@@ -1,5 +1,5 @@
 import { Model, DataTypes } from "sequelize";
-import { db } from "../config/db";
+import { db } from "../services/db";
 
 export class Cart extends Model {
   public cart_id!: number;

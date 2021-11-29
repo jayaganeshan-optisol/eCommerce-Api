@@ -1,5 +1,5 @@
 import { Transaction } from "sequelize/types";
-import { db } from "../config/db";
+import { db } from "../services/db";
 import { calcDate, IOrder, IOrderAttributes, Order } from "../models/Orders";
 import { OrderItems } from "../models/Order_items";
 import { Product } from "../models/Products";

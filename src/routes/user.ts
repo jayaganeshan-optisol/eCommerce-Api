@@ -14,10 +14,8 @@ router.post("/login", ValidateLogin, userController.login);
 //Change Password
 router.post("/changepassword", ValidateChangePassword, auth(all), userController.changePassword);
 //get all users
-
 router.get("/user/all", auth(onlyAdmin), userController.findAll);
 //adding shipping address
-
 router.patch("/update/shipping", ValidateShippingAddress, auth(Seller_Buyer_Both), userController.shippingUpdate);
 
 router.get("/test", (req: any, res: any) => {

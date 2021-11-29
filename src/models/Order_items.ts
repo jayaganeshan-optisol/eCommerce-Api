@@ -1,5 +1,5 @@
 import { Model, DataTypes } from "sequelize";
-import { db } from "../config/db";
+import { db } from "../services/db";
 
 export interface IOrderItems {
   product_id: number;

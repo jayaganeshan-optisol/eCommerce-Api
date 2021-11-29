@@ -1,17 +1,17 @@
 import { Request, Response } from "express";
-import { addShipping, getUserByMail, getAllUsers, loginUser, passwordChange, CreateUser, getUserByID } from "../dao/user.dao.";
-import { User } from "../models/User";
+import { addShipping, getUserByMail, getAllUsers, CreateUser, getUserByID } from "../dao/user.dao.";
 import { generateToken } from "../services/tokenHandling";
 import { comparePassword, hashPassword } from "../services/passwordHandling";
+import config from "config";
 const Verifier = require("email-verifier");
 
 //Registering a User
 const register = async (req: Request, res: Response) => {
   let user = await getUserByMail(req.body.email);
   if (user) {
-    return res.status(403).send("User Already Exists");
+    return res.status(403).send({ message: "User Already Exists" });
   }
-  const verifier = new Verifier(process.env.EMAIL_VERIFY);
+  const verifier = new Verifier(config.get("EMAIL_VERIFY"));
 
   verifier.verify(req.body.email, (err: any, data: any) => {
     if (err) {
@@ -42,11 +42,11 @@ const login = async (req: Request, res: Response) => {
     if (!pass) return res.status(400).send({ error: "Invalid Password" });
     const { user_id, role } = user;
     const token = generateToken({ user_id, role });
-    return res.send({ message: token });
+    return res.send({ token: token });
   }
 };
 
-//changing Password
+//changing new Password for User
 const changePassword = async (req: Request, res: Response) => {
   const { user_id } = req.body.tokenPayload;
   const { oldPassword, newPassword } = req.body;
@@ -68,17 +68,16 @@ const changePassword = async (req: Request, res: Response) => {
   }
 };
 
-//all Users
+// Getting all Users by Admin
 const findAll = async (req: Request, res: Response) => {
-  const { statusCode, message } = await getAllUsers();
-  res.status(statusCode).send(message);
+  const users = await getAllUsers();
+  return res.send(users);
 };
 
-//adding Shipping address
+// Adding Shipping address except Admin
 const shippingUpdate = async (req: Request, res: Response) => {
-  const { user_id } = req.body.tokenPayload;
+  const { user_id, role } = req.body.tokenPayload;
   const [result] = await addShipping(user_id, req.body.shipping_address);
-  if (result === 1) return res.send("updated successfully");
-  return res.send("no changes made");
+  if (result === 1) return res.send({ message: "updated successfully" });
 };
 export const userController = { register, login, changePassword, findAll, shippingUpdate };

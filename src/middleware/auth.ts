@@ -8,11 +8,11 @@ const auth = (roles: any) => {
     (req: Request, res: Response, next: NextFunction) => {
       const token: any = getToken(req);
       if (!token) return res.status(400).send({ error: "NO token Provided" });
-      console.log(token);
+
       const decode: any = verifyToken(token);
       if (roles.length && !roles.includes(decode.role)) {
         // user's role is not authorized
-        return res.status(401).json({ error: "Unauthorized" });
+        return res.status(403).json({ error: "Unauthorized" });
       }
       req.body.tokenPayload = decode;
       next();

@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router } from "express";
 import { cartController } from "../controllers/cart.controller";
 import auth from "../middleware/auth";
 import { validateCart } from "../middleware/validation/cartValidation";

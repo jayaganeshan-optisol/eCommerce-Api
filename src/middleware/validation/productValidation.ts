@@ -21,7 +21,7 @@ export const validateProduct = (req: Request, res: Response, next: NextFunction)
   next();
 };
 
-//Validate Prodcut Update
+//Validate Product Update
 export const validateProductUpdate = (req: Request, res: Response, next: NextFunction) => {
   const product = {
     product_name: req.body.product_name,

@@ -17,18 +17,22 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateUser"
-
         required: true
       responses:
         "200":
           description: Success
-          content: 
+          content:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
         "400":
           $ref: "#/components/responses/BadRequest"
-            
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
   /login:
     post:
       tags:
@@ -42,11 +46,22 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/LoginUser"
-
         required: true
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
   /changepassword:
     post:
       tags:
@@ -66,8 +81,18 @@ paths:
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangePasswordResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "403":
-          description: Access Denied
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
   /user/all:
     get:
       tags:
@@ -77,14 +102,21 @@ paths:
       summary: Returns all users in array
       description: Get all Users
       operationId: getAllUsers
-
       responses:
         "200":
           description: Success
-        "401":
-          description: Invalid Token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAllResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "403":
-          description: Access Denied
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /update/shipping:
     patch:
@@ -105,6 +137,18 @@ paths:
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateShippingResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
   #cart
   /cart:
     post:
@@ -115,7 +159,6 @@ paths:
       summary: Return the cart object
       description: ""
       operationId: addCart
-
       requestBody:
         description: Product Details
         content:
@@ -126,6 +169,18 @@ paths:
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
   /cart/view:
     get:
       tags:
@@ -135,12 +190,23 @@ paths:
       summary: Return cart of user
       description: ""
       operationId: getCart
-
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCartResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
   /cart/update:
-    post:
+    patch:
       tags:
         - Cart
       security:
@@ -159,7 +225,19 @@ paths:
       responses:
         "200":
           description: Success
-  /cart/deleteAll:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateCartResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /cart/all/delete:
     delete:
       tags:
         - Cart
@@ -168,10 +246,21 @@ paths:
       summary: Delete cart of user
       description: ""
       operationId: deleteAllCart
-
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteAllCartResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
   /cart/delete/{id}:
     delete:
       tags:
@@ -190,16 +279,42 @@ paths:
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteProductCartResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
   #Wish-List
   /wishlist:
     get:
       tags:
         - Wish-List
+      security:
+        - bearerAuth: []
       summary: Returns products in wishlist
       operationId: getWishlist
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetWishListResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /wishlist/add:
     post:
@@ -220,6 +335,18 @@ paths:
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WishList"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
   /Wishlist/remove/{id}:
     delete:
       tags:
@@ -238,6 +365,18 @@ paths:
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteProductWishListResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
   /Wishlist/remove:
     delete:
       tags:
@@ -250,6 +389,18 @@ paths:
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteAllWishListResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   #Products
   /product/create:
@@ -258,11 +409,10 @@ paths:
         - Product
       security:
         - bearerAuth: []
-      summary: Return Product object
-      description: ""
-      operationId: CreateProduct
+      summary: Returns a Product object
+      operationId: createProduct
       requestBody:
-        description: product Details
+        description: Create Product
         content:
           application/json:
             schema:
@@ -271,13 +421,25 @@ paths:
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
   /product/remove/{id}:
     delete:
       tags:
         - Product
       security:
         - bearerAuth: []
-      summary: Remove Product by Admin
+      summary: Remove Product by Admin or seller or both
       description: ""
       operationId: DeleteproductByAdmin
       parameters:
@@ -289,6 +451,18 @@ paths:
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteProductResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
   /product/update/{id}:
     patch:
       tags:
@@ -314,6 +488,18 @@ paths:
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateProductResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
   /product/all:
     get:
       tags:
@@ -326,6 +512,18 @@ paths:
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductAllResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
   /product/{id}:
     get:
       tags:
@@ -341,10 +539,21 @@ paths:
           schema:
             type: number
           required: true
-
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductByIdResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
   #orders
   /order:
     post:
@@ -365,19 +574,67 @@ paths:
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /order/by/cart:
+    post:
+      tags:
+        - Order
+      security:
+        - bearerAuth: []
+      summary: Return Order object
+      description: ""
+      operationId: createOrderByCart
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
   /order/all:
     get:
       tags:
         - Order
       security:
         - bearerAuth: []
-      summary: Return all orders in array by User
+      summary: Return all orders in array by Admin
       description: ""
-      operationId: get order by User
+      operationId: getAllOrdersByAdmin
       responses:
         "200":
           description: Success
-  /order/{id}:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllOrdersResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /order/cancel/{id}:
     delete:
       tags:
         - Order
@@ -392,11 +649,75 @@ paths:
           schema:
             type: number
           required: true
-
       responses:
         "200":
           description: Success
-
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CancelOrderResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /order/user:
+    get:
+      tags:
+        - Order
+      security:
+        - bearerAuth: []
+      summary: Return all orders in array by User
+      description: ""
+      operationId: getorderbyUser
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllOrdersByUserResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /order/find/{id}:
+    get:
+      tags:
+        - Order
+      security:
+        - bearerAuth: []
+      summary: Return all orders in array by User
+      description: ""
+      operationId: getorderItemsOfUser
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: number
+          required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllOrdersByUserResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
 #components
 components:
   schemas:
@@ -413,6 +734,9 @@ components:
             password:
               type: string
               example: Mypassword@07
+            role:
+              type: string
+              example: both
     LoginUser:
       allOf:
         - type: object
@@ -480,17 +804,7 @@ components:
             product:
               type: array
               items:
-                $ref: "#/components/schemas/OrderItems"
-
-    OrderItems:
-      type: "object"
-      properties:
-        product_id:
-          type: number
-          example: 1
-        quantity:
-          type: number
-          example: 2
+                $ref: "#/components/schemas/CreateCart"
     User:
       allOf:
         - type: object
@@ -506,74 +820,302 @@ components:
               example: gjai456@gmail.com
             password:
               type: string
-              example: jwttoken
+              example: hU2FsdGVkX1/9EGiIHWWZoxRKk6GnpWHzxMbjg+GlZis=
             shipping_address:
               type: string
               example: null
             createdAt:
               type: string
-              example: time zone
+              example: "2021-11-24T11:52:25.677Z"
             updatedAt:
-               type: string
-               example: time zone
-    Error:
-      type: object
-      required:
-        - statusCode
-        - message
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-  responses:
-    UserResponse:
-      description: ''
-      content:
-        application/json:
-          schema:
+              type: string
+              example: "2021-11-24T11:52:25.677Z"
+    LoginResult:
+      allOf:
+        - type: object
+          properties:
+            token:
+              type: string
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYm90aCIsImlhdCI6MTYzNzc1OTI3MiwiZXhwIjoxNjM4MDE4NDcyfQ.3raSg_R7-eeFY4per-KkZszOBvilOZq6ZlBM67PocBk"
+    ChangePasswordResult:
+      allOf:
+        - type: object
+          properties:
+            message:
+              type: string
+              example: "Successfully Changed"
+    UserAllResult:
+      allOf:
+        - type: array
+          items:
+            $ref: "#/components/schemas/User"
+    UpdateShippingResult:
+      allOf:
+        - type: object
+          properties:
+            message:
+              type: string
+              example: "updated Successfullt or no changes made"
+    #cartResults
+    Cart:
+      allOf:
+        - type: object
+          properties:
+            user_id:
+              type: number
+              example: 1
+            product_id:
+              type: number
+              example: 1
+            quantity:
+              type: number
+              example: 10
+            createdAt:
+              type: string
+              example: "2021-11-24T11:52:25.677Z"
+            updatedAt:
+              type: string
+              example: "2021-11-24T11:52:25.677Z"
+    GetCartResult:
+      allOf:
+        - type: array
+          items:
             type: object
             properties:
-              user:
-                $ref: '#/components/schemas/User'
+              product_id:
+                type: number
+                example: 1
+              product_name:
+                type: string
+                example: product 1
+              description:
+                type: string
+                example: description
+              quantity:
+                type: number
+                example: 10
+    UpdateCartResult:
+      allOf:
+        - type: object
+          properties:
+            message:
+              type: string
+              example: "Updated Successfully"
+
+    DeleteAllCartResult:
+      allOf:
+        - type: object
+          properties:
+            message:
+              type: string
+              example: "removed Successfully"
+    DeleteProductCartResult:
+      allOf:
+        - type: object
+          properties:
+            message:
+              type: string
+              example: "Product Removed Successfully"
+    #wishlistResults
+    WishList:
+      allOf:
+        - type: object
+          properties:
+            user_id:
+              type: number
+              example: 1
+            product_id:
+              type: number
+              example: 1
+            createdAt:
+              type: string
+              example: "2021-11-24T11:52:25.677Z"
+            updatedAt:
+              type: string
+              example: "2021-11-24T11:52:25.677Z"
+    GetWishListResult:
+      allOf:
+        - type: array
+          items:
+            type: object
+            properties:
+              product_id:
+                type: number
+                example: 1
+              product_name:
+                type: string
+                example: product 1
+              description:
+                type: string
+                example: description
+    DeleteAllWishListResult:
+      allOf:
+        - type: object
+          properties:
+            message:
+              type: string
+              example: "Removed Successfully or no changes made"
+    DeleteProductWishListResult:
+      allOf:
+        - type: object
+          properties:
+            message:
+              type: string
+              example: "Removed Successfully or No product to remove"
+    #productResult
+    Product:
+      allOf:
+        - type: object
+          properties:
+            product_id:
+              type: number
+              example: 1
+            product_name:
+              type: string
+              example: product 1
+            description:
+              type: string
+              example: Description about product
+            unit_price:
+              type: number
+              example: 599
+            number_in_stock:
+              type: number
+              example: 100
+            seller_name:
+              type: string
+              example: Alex
+            createdAt:
+              type: string
+              example: "2021-11-24T11:52:25.677Z"
+            updatedAt:
+              type: string
+              example: "2021-11-24T11:52:25.677Z"
+
+    DeleteProductResult:
+      allOf:
+        - type: object
+          properties:
+            message:
+              type: string
+              example: "Product Removed Successfully"
+    UpdateProductResult:
+      allOf:
+        - type: object
+        - $ref: "#/components/schemas/Product"
+    ProductAllResult:
+      allOf:
+        - type: array
+          items:
+            $ref: "#/components/schemas/Product"
+    ProductByIdResult:
+      allOf:
+        - type: object
+        - $ref: "#/components/schemas/Product"
+    #orderResult
+    Order:
+      allOf:
+        - type: object
+          properties:
+            message:
+              type: string
+              example: "Order Placed Successfully"
+    CancelOrderResult:
+      allOf:
+        - type: object
+          properties:
+            message:
+              type: string
+              example: "Order Cancelled"
+    AllOrdersResult:
+      allOf:
+        - type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                type: number
+                example: 1
+              name:
+                type: string
+                example: Alex
+              orders:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    user_id:
+                      type: number
+                      example: 1
+                    order_id:
+                      type: number
+                      example: 1
+                    date:
+                      type: string
+                      example: 10-11-2021
+                    createdAt:
+                      type: string
+                      example: "2021-11-24T14:15:14.000Z"
+                    updatedAt:
+                      type: string
+                      example: "2021-11-24T14:15:14.000Z"
+
+    AllOrdersByUserResult:
+      allOf:
+        - type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                type: number
+                example: 1
+              order_id:
+                type: number
+                example: 1
+              totalprice:
+                type: number
+                example: 16000
+
+  #responses
+  responses:
     NotFound:
       description: The specified resource was not found
       content:
         application/json:
           schema:
-            allOf:
-              - $ref: '#/components/schemas/Error'
-              - type: object
-                properties:
-                  statusCode:
-                    type: number
-                    example: 404
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Error Message"
+
     Unauthorized:
       description: Unauthorized
       content:
         application/json:
           schema:
-            allOf:
-              - $ref: '#/components/schemas/Error'
-              - type: object
-                properties:
-                  statusCode:
-                    type: number
-                    example: 401
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
     BadRequest:
       description: BadRequest
       content:
         application/json:
           schema:
-            allOf:
-              - $ref: '#/components/schemas/Error'
-              - type: object
-                properties:
-                  statusCode:
-                    type: number
-                    example: 400
-            
-              
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Error Message"
+    ServerError:
+      description: BadRequest
+      content:
+        application/json:
+          schema:
+            type: string
+            example: Something Failed!
 
   #security Schemes
   securitySchemes:

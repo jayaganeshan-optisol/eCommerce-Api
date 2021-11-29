@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
+import { Request, Response, NextFunction, ErrorRequestHandler } from "express";
 
 const error = async (err: ErrorRequestHandler, req: Request, res: Response, next: NextFunction) => {
-  return res.status(500).send('Something failed!');
+  return res.status(500).send({ error: "Something failed!" });
 };
 
 export default error;

@@ -16,3 +16,5 @@ router.patch("/update/:id", validateParamsId, validateProductUpdate, auth(Admin_
 router.get("/all", auth(all), productController.findAllProduct);
 //get product by product Id
 router.get("/:id", validateParamsId, auth(all), productController.findProductById);
+
+

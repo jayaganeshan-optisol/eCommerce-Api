@@ -5,14 +5,17 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/app.js",
-    "dev": "nodemon src/app.ts",
-    "build-ts": "tsc -p ."
+    "dev": "nodemon  src/app.ts",
+    "build-ts": "tsc -p .",
+    "test": "mocha --timeout 5000 --check-leaks -r ts-node/register -r tsconfig-paths/register \"src/test/**/*.test.ts\""
   },
   "keywords": [],
   "author": "Jayaganeshan",
   "license": "ISC",
   "devDependencies": {
-    "@types/config": "0.0.39",
+    "@types/chai": "^4.2.22",
+    "@types/chai-http": "^4.2.0",
+    "@types/config": "0.0.40",
     "@types/cors": "^2.8.12",
     "@types/crypto-js": "^4.0.2",
     "@types/dotenv": "^8.2.0",
@@ -20,14 +23,17 @@
     "@types/joi": "^17.2.3",
     "@types/jsonwebtoken": "^8.5.5",
     "@types/lodash": "^4.14.176",
+    "@types/mocha": "^9.0.0",
     "@types/node": "^16.11.4",
     "@types/sequelize": "^4.28.10",
     "@typescript-eslint/eslint-plugin": "^5.1.0",
     "@typescript-eslint/parser": "^5.1.0",
+    "chai": "^4.3.4",
     "config": "^3.3.6",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.25.2",
+    "mocha": "^9.1.3",
     "nodemon": "^2.0.14",
     "prettier": "^2.4.1",
     "ts-node": "^10.4.0",
@@ -36,6 +42,7 @@
   "dependencies": {
     "@types/swagger-ui-express": "^4.1.3",
     "@types/yamljs": "^0.2.31",
+    "chai-http": "^4.3.0",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
     "dotenv": "^10.0.0",
@@ -48,6 +55,7 @@
     "mysql2": "^2.3.3-rc.0",
     "sequelize": "^6.9.0",
     "swagger-ui-express": "^4.1.6",
+    "tsconfig-paths": "^3.12.0",
     "yamljs": "^0.3.0"
   }
 }
