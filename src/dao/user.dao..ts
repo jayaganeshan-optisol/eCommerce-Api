@@ -14,8 +14,8 @@ export const getUserByMail = async (email: string) => {
   return user;
 };
 
-export const CreateUser = async (userCredentials: IUser) => {
-  const user = await User.create({ name: userCredentials.name, email: userCredentials.email, password: userCredentials.password, role: userCredentials.role, shipping_address: userCredentials.shipping_address });
+export const CreateUser = async (userCredentials: IUser, stripe_id: string) => {
+  const user = await User.create({ name: userCredentials.name, email: userCredentials.email, password: userCredentials.password, role: userCredentials.role, stripe_id, shipping_address: userCredentials.shipping_address });
   return user;
 };
 //find user by id

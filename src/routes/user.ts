@@ -12,13 +12,12 @@ router.post("/register", validateRegister, userController.register);
 //Login
 router.post("/login", ValidateLogin, userController.login);
 //Change Password
-router.post("/changepassword", ValidateChangePassword, auth(all), userController.changePassword);
+router.post("/change-password", ValidateChangePassword, auth(all), userController.changePassword);
 //get all users
 router.get("/user/all", auth(onlyAdmin), userController.findAll);
 //adding shipping address
 router.patch("/update/shipping", ValidateShippingAddress, auth(Seller_Buyer_Both), userController.shippingUpdate);
-
-router.get("/test", (req: any, res: any) => {
-  const user = User.findByPk(3);
-  res.send(user);
-});
+//start password reset
+router.post("/password-reset", userController.startResetPassword);
+//end password reset
+router.post("/password-reset/:id/:token", userController.endResetPassword);

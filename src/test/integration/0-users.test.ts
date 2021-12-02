@@ -5,15 +5,18 @@ chai.use(chaiHttp);
 import app from "../../app";
 import { User } from "src/models/User";
 import { generateToken } from "src/services/tokenHandling";
+import { OrderItems } from "src/models/Order_items";
+import { Order } from "src/models/Orders";
+import { Product } from "src/models/Products";
+import { db } from "src/services/db";
+import { TimeoutError } from "sequelize";
 chai.should();
 
 export let token: string;
 export let AdminToken: string;
 describe("/register", () => {
   before(async function () {
-    await User.destroy({
-      where: {},
-    });
+    await db.sync({ force: true });
   });
   it("should return user object", done => {
     const user = { name: "jai", email: "gjai456@gmail.com", password: "MyPassword@123", role: "both" };
@@ -190,12 +193,12 @@ describe("/login", () => {
   });
 });
 //change password
-describe("/changePassword", () => {
+describe("/change-password", () => {
   it("should return error if old password do not match constrain", done => {
     const loginDetails = { oldPassword: "MyPassword@", newPassword: "MyPassword@321" };
     chai
       .request(app)
-      .post("/changepassword")
+      .post("/change-password")
       .send(loginDetails)
       .set({ Authorization: `Bearer ${token}` })
       .end((err, res) => {
@@ -210,7 +213,7 @@ describe("/changePassword", () => {
     const loginDetails = { oldPassword: "MyPassword@123", newPassword: "MyPassword@" };
     chai
       .request(app)
-      .post("/changepassword")
+      .post("/change-password")
       .send(loginDetails)
       .set({ Authorization: `Bearer ${token}` })
       .end((err, res) => {
@@ -225,7 +228,7 @@ describe("/changePassword", () => {
     const loginDetails = { oldPassword: "MyPassword@123", newPassword: "MyPassword@321" };
     chai
       .request(app)
-      .post("/changepassword")
+      .post("/change-password")
       .send(loginDetails)
       .end((err, res) => {
         res.should.have.status(400);
@@ -239,7 +242,7 @@ describe("/changePassword", () => {
     const loginDetails = { oldPassword: "MyPassword@321", newPassword: "MyPassword@321" };
     chai
       .request(app)
-      .post("/changepassword")
+      .post("/change-password")
       .send(loginDetails)
       .set({ Authorization: `Bearer ${token}` })
       .end((err, res) => {
@@ -254,7 +257,7 @@ describe("/changePassword", () => {
     const loginDetails = { oldPassword: "MyPassword@123", newPassword: "MyPassword@321" };
     chai
       .request(app)
-      .post("/changepassword")
+      .post("/change-password")
       .send(loginDetails)
       .set({ Authorization: `Bearer ${token}` })
       .end((err, res) => {

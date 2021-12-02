@@ -6,12 +6,12 @@ import { token } from "./0-users.test";
 import { generateToken, verifyToken } from "src/services/tokenHandling";
 import { send } from "process";
 import { createProduct } from "src/dao/products.dao";
-import { result } from "lodash";
 chai.use(chaiHttp);
 
 let AdminToken: string;
 let product_id: number;
 let order_id: number;
+
 describe("Placing the order", () => {
   before(async function () {
     await chai.request(app).post("/register").send({ name: "Alex", email: "mjayaganeshan@gmail.com", password: "MyPassword@123", role: "admin" });
@@ -133,7 +133,6 @@ describe("/get all orders by admin", () => {
       .get("/order/all")
       .set({ Authorization: `Bearer ${AdminToken}` })
       .end((err, res) => {
-        console.log;
         res.should.have.status(200);
         res.body.should.be.a("array");
         done();
@@ -164,7 +163,6 @@ describe("/get all orders by user", () => {
       .get("/order/user")
       .set({ Authorization: `Bearer ${token}` })
       .end((err, res) => {
-        console.log;
         res.should.have.status(200);
         res.body.should.be.a("array");
         done();
@@ -195,7 +193,6 @@ describe("/get all order_items of order by user", () => {
       .get("/order/find/" + order_id)
       .set({ Authorization: `Bearer ${token}` })
       .end((err, res) => {
-        console.log;
         res.should.have.status(200);
         res.body.should.be.a("array");
         done();
@@ -228,7 +225,6 @@ describe("Place Order by cart", () => {
   });
   it("should return error if fake User to place order in cart", done => {
     const fakeToken = generateToken({ user_id: 1000, role: "both" });
-    console.log(fakeToken);
     chai
       .request(app)
       .post("/order/by/cart")
