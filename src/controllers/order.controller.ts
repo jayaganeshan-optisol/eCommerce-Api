@@ -1,10 +1,13 @@
-import { Response, Request, response } from "express";
+import { Response, Request } from "express";
 import { db } from "../services/db";
 import { createOrderItems, getOrderItemsById } from "../dao/orderItems.dao";
-import { getAllOrders, placeOrder, cancelOrder, getOrderById, getProductsInOrder, getProductsInOrderItems } from "../dao/orders.dao.";
+import { getAllOrders, placeOrder, cancelOrder, getOrderById, getProductsInOrder, getProductsInOrderItems, getOrderByUserIdOrderId } from "../dao/orders.dao.";
 import { getProductById, changeStockInProduct } from "../dao/products.dao";
 import { getUserByID } from "../dao/user.dao.";
 import { calcDate } from "../models/Orders";
+import { stripe } from "../app";
+import { Payment } from "../models/Payment";
+
 //Creating Order by buyer or both
 const createOrder = async (req: Request, res: Response) => {
   const { user_id } = req.body.tokenPayload;
@@ -73,7 +76,6 @@ const deleteOrder = async (req: Request, res: Response) => {
 //Order directly form cart of user
 const orderCart = async (req: Request, res: Response) => {
   const { user_id } = req.body.tokenPayload;
-  console.log(user_id);
   const user: any = await getUserByID(user_id);
   if (!user) return res.status(404).send({ error: "No user found" });
   const cart = await user.getCartProducts();
@@ -114,7 +116,6 @@ const orderCart = async (req: Request, res: Response) => {
 const findOrderByUser = async (req: Request, res: Response) => {
   const { user_id } = req.body.tokenPayload;
   const orders: any = await getProductsInOrder(user_id);
-  // return res.send(orders);
   let result: any = [];
   orders.forEach((order: any) => {
     let sum: number = 0;
@@ -139,4 +140,32 @@ const findOrderItemsByUser = async (req: Request, res: Response) => {
   });
   res.send(orderItems);
 };
-export const orderController = { createOrder, ordersByUser, deleteOrder, orderCart, findOrderByUser, findOrderItemsByUser };
+
+const payment = async (req: Request, res: Response) => {
+  const { user_id, stripe_id } = req.body.tokenPayload;
+  const order_id = parseInt(req.params.order_id);
+  const { card } = req.body;
+  const order: any = await getOrderByUserIdOrderId(user_id, order_id);
+  const paymentDetails = await Payment.findOne({ where: { user_id, order_id } });
+  if (paymentDetails) return res.send({ error: "Payment already made" });
+  let sum: number = 0;
+  order.products.forEach((product: any) => {
+    const temp = product.unit_price * product.order_item.quantity;
+    sum = sum + temp;
+  });
+  const orderDetails = { order_id: order.order_id, date: order.date, total_price: sum };
+  //stripe
+  const token: any = await stripe.tokens.create({ card });
+  await stripe.customers.createSource(stripe_id, {
+    source: token.id,
+  });
+  const { id, paid } = await stripe.charges.create({
+    amount: orderDetails.total_price,
+    currency: "inr",
+    customer: stripe_id,
+  });
+  console.log(id, paid);
+  const paymentInfo = await Payment.create({ user_id, order_id, payment_date: order.date, payment_id: id, payment_status: paid });
+  res.send({ message: `Payment successful with paymentID card_1K1vc0SIoB4FwKhua5TLZi0t` });
+};
+export const orderController = { createOrder, ordersByUser, deleteOrder, orderCart, findOrderByUser, findOrderItemsByUser, payment };

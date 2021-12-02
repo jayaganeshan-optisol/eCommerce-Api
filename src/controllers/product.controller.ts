@@ -11,10 +11,10 @@ const addProduct = async (req: Request, res: Response) => {
   const product = await createProduct(product_name, description, unit_price, number_in_stock, user.name);
   res.send(product);
 };
-//Removing a  product by seller or both
+//Removing a  product by seller or both and Admin
 const deleteProduct = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { user_id } = req.body.tokenPayload;
+  const { user_id, role } = req.body.tokenPayload;
   const user: any = await getUserByID(user_id);
   const order_item = await getOrderItemsByProductId(parseInt(id));
   if (!user) return res.status(400).send({ error: "User not Identified" });
@@ -25,6 +25,10 @@ const deleteProduct = async (req: Request, res: Response) => {
     if (!product) {
       res.status(404).send("no such product");
     } else {
+      if (role === "admin") {
+        await product?.destroy();
+        return res.send({ message: "Product Removed Successfully" });
+      }
       if (product.seller_name !== user.name) return res.status(400).send({ error: "Invalid seller to remove Product" });
       await product?.destroy();
       return res.send({ message: "Product Removed Successfully" });

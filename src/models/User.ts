@@ -5,6 +5,7 @@ import { Product } from "../models/Products";
 import { Cart } from "./Cart";
 import { WishList } from "./WishList";
 import { hashPassword } from "../services/passwordHandling";
+import { Token } from "./Token";
 export enum AccountType {
   admin,
   seller,
@@ -17,6 +18,7 @@ interface IUser {
   email: string;
   password: string;
   role: AccountType;
+  stripe_id: string;
   shipping_address: string;
 }
 interface IUserAttributes extends Optional<IUser, "user_id"> {}
@@ -56,6 +58,9 @@ User.init(
       values: ["admin", "seller", "buyer", "both"],
       defaultValue: "buyer",
     },
+    stripe_id: {
+      type: DataTypes.STRING,
+    },
     shipping_address: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -71,8 +76,13 @@ User.beforeCreate(async (user: any, options) => {
   const hashedPassword = hashPassword(user.password);
   user.password = hashedPassword;
 });
+User.beforeUpdate(async (user: any, options) => {
+  const hashedPassword = hashPassword(user.password);
+  user.password = hashedPassword;
+});
 
 User.hasMany(Order, { foreignKey: "user_id" });
+User.hasOne(Token, { foreignKey: "user_id" });
 
 User.belongsToMany(Product, { through: Cart, foreignKey: "user_id", as: "CartProducts" });
 Product.belongsToMany(User, {

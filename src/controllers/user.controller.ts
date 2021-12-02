@@ -3,11 +3,14 @@ import { addShipping, getUserByMail, getAllUsers, CreateUser, getUserByID } from
 import { generateToken } from "../services/tokenHandling";
 import { comparePassword, hashPassword } from "../services/passwordHandling";
 import config from "config";
+import { createToken, getToken } from "../dao/token.dao";
+import { mail } from "../services/mailer";
+import { stripe } from "../app";
 const Verifier = require("email-verifier");
 
 //Registering a User
 const register = async (req: Request, res: Response) => {
-  let user = await getUserByMail(req.body.email);
+  let user: any = await getUserByMail(req.body.email);
   if (user) {
     return res.status(403).send({ message: "User Already Exists" });
   }
@@ -25,7 +28,12 @@ const register = async (req: Request, res: Response) => {
     if (result.smtpCheck == "false") {
       return res.send(404).send({ error: "Enter valid email" });
     } else {
-      user = await CreateUser(req.body);
+      const { id } = await stripe.customers.create({
+        name: req.body.name,
+        email: req.body.email,
+        description: "test customer",
+      });
+      user = await CreateUser(req.body, id);
       return res.status(200).send(user);
     }
   }, 3000);
@@ -40,8 +48,8 @@ const login = async (req: Request, res: Response) => {
     const { password } = user;
     const pass = comparePassword(password, req.body.password);
     if (!pass) return res.status(400).send({ error: "Invalid Password" });
-    const { user_id, role } = user;
-    const token = generateToken({ user_id, role });
+    const { user_id, role, stripe_id } = user;
+    const token = generateToken({ user_id, role, stripe_id });
     return res.send({ token: token });
   }
 };
@@ -80,4 +88,28 @@ const shippingUpdate = async (req: Request, res: Response) => {
   const [result] = await addShipping(user_id, req.body.shipping_address);
   if (result === 1) return res.send({ message: "updated successfully" });
 };
-export const userController = { register, login, changePassword, findAll, shippingUpdate };
+//Start Reset password
+const startResetPassword = async (req: Request, res: Response) => {
+  const email = req.body.email;
+  const user: any = await getUserByMail(email);
+
+  if (!user) return res.status(404).send({ error: "User don't exists" });
+  const tokenObject: any = await createToken(user.user_id);
+  const link = `${config.get("BASE_URL")}/password-reset/${user.user_id}/${tokenObject.token}`;
+  console.log(link);
+  await mail(user.name, user.email, "Password Reset", link);
+  return res.send({ message: "password reset link sent to your email account" });
+};
+const endResetPassword = async (req: Request, res: Response) => {
+  const user: any = await getUserByID(parseInt(req.params.id));
+  if (!user) return res.status(400).send({ error: "Invalid link or expired" });
+
+  const token = await getToken(user.user_id, req.params.token);
+  if (!token) return res.status(400).send({ error: "Invalid link or expired" });
+
+  user.password = req.body.password;
+  await user.save();
+  await token.destroy();
+  res.send({ message: "password reset successfully." });
+};
+export const userController = { register, login, changePassword, findAll, shippingUpdate, startResetPassword, endResetPassword };
