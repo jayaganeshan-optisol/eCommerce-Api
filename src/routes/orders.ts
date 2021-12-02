@@ -21,3 +21,5 @@ router.get("/user", auth(Buyer_Both), orderController.findOrderByUser);
 
 //get order Items by User
 router.get("/find/:id", auth(Buyer_Both), validateParamsId, orderController.findOrderItemsByUser);
+
+router.post("/payment/:order_id", auth(Buyer_Both), orderController.payment);

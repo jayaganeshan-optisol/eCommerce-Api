@@ -62,7 +62,7 @@ paths:
           $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/ServerError"
-  /changepassword:
+  /change-password:
     post:
       tags:
         - user
@@ -125,7 +125,7 @@ paths:
       security:
         - bearerAuth: []
       summary: Updating the User's Shipping address
-      description: Changing password
+      description: updating shipping
       operationId: addShipping
       requestBody:
         description: add or update Shipping
@@ -141,6 +141,73 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateShippingResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /password-reset:
+    post:
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      summary: Send mail to user
+      description: Changing password
+      operationId: mailResetPassword
+      requestBody:
+        description: email for reset password link to be sent
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPassword"
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResetPasswordMailSent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /password-reset/{id}/{token}:
+    post:
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      summary: Redirect link 
+      description: Changing password
+      operationId: ResetPassword
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: number
+          required: true
+        - name: token
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResetPasswordSuccess"
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
@@ -718,6 +785,43 @@ paths:
           $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/ServerError"
+  /order/payment/{order_id}:
+    post:
+      tags:
+        - Order
+      security:
+        - bearerAuth: []
+      summary: Pay for Order
+      description: ""
+      operationId: PayOrder
+      parameters:
+        - name: order_id
+          in: path
+          schema:
+            type: number
+          required: true
+      requestBody:
+        description: Card Details
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CardDetails"
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
 #components
 components:
   schemas:
@@ -805,6 +909,33 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/CreateCart"
+    ResetPassword:
+      allOf:
+        - type: object
+          properties:
+            email:
+              type: string
+              example: "gjai456@gmail.com"
+    CardDetails:
+      allOf:
+        - type: object
+          properties:
+            card:
+              type: object
+              properties: 
+                number:
+                  type: string
+                  example: "4242424242424242"
+                exp_month:
+                  type: number
+                  example: 12
+                exp_year:
+                  type: number
+                  example: 2022
+                cvc:
+                  type: string
+                  example: "314"
+#User Response
     User:
       allOf:
         - type: object
@@ -856,6 +987,21 @@ components:
             message:
               type: string
               example: "updated Successfullt or no changes made"
+    ResetPasswordMailSent:
+      allOf:
+        - type: object
+          properties:
+            message:
+              type: string
+              example: "password reset link sent to your email account"
+    ResetPasswordSuccess:
+      allOf:
+        - type: object
+          properties:
+            message:
+              type: string
+              example: "password reset successfully."
+
     #cartResults
     Cart:
       allOf:
@@ -1075,7 +1221,13 @@ components:
               totalprice:
                 type: number
                 example: 16000
-
+    Payment:
+      allOf:
+        - type: object
+          properties:
+            message:
+              type: string
+              example: Payment successful with paymentID ch_3K272VSIoB4FwKhu0xhs96WM
   #responses
   responses:
     NotFound:
@@ -1114,8 +1266,11 @@ components:
       content:
         application/json:
           schema:
-            type: string
-            example: Something Failed!
+            type: object
+            properties:
+                error:
+                  type: string
+                  example: "Something failed!"
 
   #security Schemes
   securitySchemes:

@@ -22,7 +22,6 @@ describe("Adding product to wishlist", () => {
       .set({ Authorization: `Bearer ${AdminToken}` })
       .send(product)
       .end((err, res) => {
-        console.log(res.body);
         res.should.have.status(403);
         res.body.should.be.a("object");
         res.body.should.have.property("error");
@@ -69,7 +68,6 @@ describe("getting all products in wishlist by user", () => {
       .get("/wishlist/")
       .set({ Authorization: `Bearer ${AdminToken}` })
       .end((err, res) => {
-        console.log(res.body);
         res.should.have.status(403);
         res.body.should.be.a("object");
         res.body.should.have.property("error");
@@ -83,7 +81,6 @@ describe("getting all products in wishlist by user", () => {
       .get("/wishlist/")
       .set({ Authorization: `Bearer ${token}` })
       .end((err, res) => {
-        console.log(res.body);
         res.should.have.status(200);
         res.body.should.be.a("array");
         done();
@@ -99,7 +96,6 @@ describe("remove Product from wishlist by product ID", () => {
       .delete("/wishlist/remove/" + product_id)
       .set({ Authorization: `Bearer ${AdminToken}` })
       .end((err, res) => {
-        console.log(res.body);
         res.should.have.status(403);
         res.body.should.be.a("object");
         res.body.should.have.property("error");
@@ -113,7 +109,6 @@ describe("remove Product from wishlist by product ID", () => {
       .delete("/wishlist/remove/" + product_id)
       .set({ Authorization: `Bearer ${token}` })
       .end((err, res) => {
-        console.log(res.body);
         res.should.have.status(200);
         res.body.should.be.a("object");
         res.body.should.have.property("message");
@@ -139,7 +134,6 @@ describe("remove Product from wishlist by product ID", () => {
       .delete("/wishlist/remove/" + product_id)
       .set({ Authorization: `Bearer ${AdminToken}` })
       .end((err, res) => {
-        console.log(res.body);
         res.should.have.status(403);
         res.body.should.be.a("object");
         res.body.should.have.property("error");
@@ -153,7 +147,6 @@ describe("remove Product from wishlist by product ID", () => {
       .delete("/wishlist/remove")
       .set({ Authorization: `Bearer ${token}` })
       .end((err, res) => {
-        console.log(res.body);
         res.should.have.status(200);
         res.body.should.be.a("object");
         res.body.should.have.property("message");
