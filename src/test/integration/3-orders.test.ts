@@ -16,7 +16,7 @@ describe("Placing the order", () => {
   before(async function () {
     await chai.request(app).post("/register").send({ name: "Alex", email: "mjayaganeshan@gmail.com", password: "MyPassword@123", role: "admin" });
     const response = await chai.request(app).post("/login").send({ email: "mjayaganeshan@gmail.com", password: "MyPassword@123" });
-    const product: any = await createProduct("testing Product", "test description", 10, 10, "alex");
+    const product: any = await createProduct("testing Product", "test description", 10, 100, "alex");
     product_id = product.product_id;
     AdminToken = response.body.token;
   });
@@ -99,7 +99,7 @@ describe("Placing the order", () => {
       .request(app)
       .post("/order/")
       .set({ Authorization: `Bearer ${token}` })
-      .send({ product: [{ product_id: product_id, quantity: 1 }] })
+      .send({ product: [{ product_id: product_id, quantity: 50 }] })
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.a("object");
@@ -247,6 +247,66 @@ describe("Place Order by cart", () => {
         res.body.should.be.a("object");
         res.body.should.have.property("message");
         res.body.message.should.equals("Order Placed Successfully");
+        done();
+      });
+  });
+});
+
+//pay for order
+describe("/order/payment/order_id", () => {
+  it("should return error if seller try to pay for order", done => {
+    const sellerToken = generateToken({ user_id: 1, role: "seller", stripe_id: "cus_kjsdfkjshfoe" });
+    chai
+      .request(app)
+      .post("/order/payment/" + order_id)
+      .set({ Authorization: `Bearer ${sellerToken}` })
+      .send({ card: { number: "4242424242424242", exp_month: 12, exp_year: 2022, cvc: "314" } })
+      .end((err, res) => {
+        res.should.have.status(403);
+        res.body.should.be.a("object");
+        res.body.should.have.property("error");
+        res.body.error.should.equals("Unauthorized");
+        done();
+      });
+  });
+  it("should return error if card details is not provided for order", done => {
+    chai
+      .request(app)
+      .post("/order/payment/" + order_id)
+      .set({ Authorization: `Bearer ${token}` })
+      .send({ card: "" })
+      .end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.be.a("object");
+        res.body.should.have.property("error");
+        done();
+      });
+  });
+
+  it("should return payment success message", done => {
+    chai
+      .request(app)
+      .post("/order/payment/" + order_id)
+      .set({ Authorization: `Bearer ${token}` })
+      .send({ card: { number: "4242424242424242", exp_month: 12, exp_year: 2022, cvc: "314" } })
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.a("object");
+        res.body.should.have.property("message");
+        done();
+      });
+  });
+  it("should return payment already made error message", done => {
+    chai
+      .request(app)
+      .post("/order/payment/" + order_id)
+      .set({ Authorization: `Bearer ${token}` })
+      .send({ card: { number: "4242424242424242", exp_month: 12, exp_year: 2022, cvc: "314" } })
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.a("object");
+        res.body.should.have.property("error");
+        res.body.error.should.equals("Payment already made");
         done();
       });
   });

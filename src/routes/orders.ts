@@ -3,7 +3,7 @@ import auth from "../middleware/auth";
 import { orderController } from "../controllers/order.controller";
 import { validateParamsId } from "../middleware/validation/paramsValaditor";
 import { Buyer_Both, onlyAdmin } from "../services/Roles";
-import { validateOrder } from "../middleware/validation/orderValidation";
+import { validateCard, validateOrder } from "../middleware/validation/orderValidation";
 
 export const router: Router = Router();
 //create order by user
@@ -22,4 +22,4 @@ router.get("/user", auth(Buyer_Both), orderController.findOrderByUser);
 //get order Items by User
 router.get("/find/:id", auth(Buyer_Both), validateParamsId, orderController.findOrderItemsByUser);
 
-router.post("/payment/:order_id", auth(Buyer_Both), orderController.payment);
+router.post("/payment/:order_id", auth(Buyer_Both), validateCard, orderController.payment);

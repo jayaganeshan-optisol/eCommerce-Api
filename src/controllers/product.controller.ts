@@ -19,11 +19,11 @@ const deleteProduct = async (req: Request, res: Response) => {
   const order_item = await getOrderItemsByProductId(parseInt(id));
   if (!user) return res.status(400).send({ error: "User not Identified" });
   if (order_item) {
-    res.send("cannot delete the product of Order Item");
+    res.status(400).send({ error: "cannot delete the product of Order Item" });
   } else {
     const product: any = await getProductById(parseInt(id));
     if (!product) {
-      res.status(404).send("no such product");
+      res.status(404).send({ error: "no such product" });
     } else {
       if (role === "admin") {
         await product?.destroy();

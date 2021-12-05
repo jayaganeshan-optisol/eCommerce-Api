@@ -131,7 +131,7 @@ describe("Creating the Product", () => {
       });
   });
   it("Should return product Object if valid details are given", done => {
-    const user = { product_name: "product 1", description: "sample description", unit_price: 100, number_in_stock: 100 };
+    const user = { product_name: "product 1", description: "sample description", unit_price: 100, number_in_stock: 1000 };
     chai
       .request(app)
       .post("/product/create")

@@ -49,3 +49,13 @@ export const ValidateShippingAddress = (req: Request, res: Response, next: NextF
     res.status(400).send({ error: error.details[0].message });
   } else next();
 };
+
+export const validateEmail = (req: Request, res: Response, next: NextFunction) => {
+  const schema = Joi.object({
+    email: Joi.string().min(8).max(45).email().required(),
+  });
+  const { error } = schema.validate(req.body);
+  if (error) {
+    res.status(400).send({ error: error.details[0].message });
+  } else next();
+};

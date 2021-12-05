@@ -160,12 +160,12 @@ const payment = async (req: Request, res: Response) => {
     source: token.id,
   });
   const { id, paid } = await stripe.charges.create({
-    amount: orderDetails.total_price,
+    amount: orderDetails.total_price * 100,
     currency: "inr",
     customer: stripe_id,
   });
   console.log(id, paid);
   const paymentInfo = await Payment.create({ user_id, order_id, payment_date: order.date, payment_id: id, payment_status: paid });
-  res.send({ message: `Payment successful with paymentID card_1K1vc0SIoB4FwKhua5TLZi0t` });
+  return res.send({ message: `Payment successful with paymentID card_1K1vc0SIoB4FwKhua5TLZi0t` });
 };
 export const orderController = { createOrder, ordersByUser, deleteOrder, orderCart, findOrderByUser, findOrderItemsByUser, payment };

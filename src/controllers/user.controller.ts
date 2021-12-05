@@ -36,7 +36,7 @@ const register = async (req: Request, res: Response) => {
       user = await CreateUser(req.body, id);
       return res.status(200).send(user);
     }
-  }, 3000);
+  }, 4000);
 };
 // Logging In
 const login = async (req: Request, res: Response) => {
@@ -68,9 +68,9 @@ const changePassword = async (req: Request, res: Response) => {
     if (!pass) {
       return res.status(400).send({ error: "Invalid Old password" });
     } else {
-      const newPass = hashPassword(newPassword);
-      user.password = newPass;
+      user.password = newPassword;
       await user.save();
+      console.log(user);
       return res.send({ message: "Successfully Changed" });
     }
   }
@@ -96,12 +96,11 @@ const startResetPassword = async (req: Request, res: Response) => {
   if (!user) return res.status(404).send({ error: "User don't exists" });
   const tokenObject: any = await createToken(user.user_id);
   const link = `${config.get("BASE_URL")}/password-reset/${user.user_id}/${tokenObject.token}`;
-  console.log(link);
   await mail(user.name, user.email, "Password Reset", link);
   return res.send({ message: "password reset link sent to your email account" });
 };
 const endResetPassword = async (req: Request, res: Response) => {
-  const user: any = await getUserByID(parseInt(req.params.id));
+  const user: any = await getUserByID(parseInt(req.params.order_id));
   if (!user) return res.status(400).send({ error: "Invalid link or expired" });
 
   const token = await getToken(user.user_id, req.params.token);

@@ -3,13 +3,8 @@ import chai from "chai";
 import { describe, before } from "mocha";
 chai.use(chaiHttp);
 import app from "../../app";
-import { User } from "src/models/User";
 import { generateToken } from "src/services/tokenHandling";
-import { OrderItems } from "src/models/Order_items";
-import { Order } from "src/models/Orders";
-import { Product } from "src/models/Products";
 import { db } from "src/services/db";
-import { TimeoutError } from "sequelize";
 chai.should();
 
 export let token: string;
@@ -32,6 +27,7 @@ describe("/register", () => {
         res.body.should.have.property("email");
         res.body.should.have.property("password");
         res.body.should.have.property("role");
+        res.body.should.have.property("stripe_id");
         done();
       });
   });
@@ -195,11 +191,11 @@ describe("/login", () => {
 //change password
 describe("/change-password", () => {
   it("should return error if old password do not match constrain", done => {
-    const loginDetails = { oldPassword: "MyPassword@", newPassword: "MyPassword@321" };
+    const passwordDetails = { oldPassword: "MyPassword@", newPassword: "MyPassword@321" };
     chai
       .request(app)
       .post("/change-password")
-      .send(loginDetails)
+      .send(passwordDetails)
       .set({ Authorization: `Bearer ${token}` })
       .end((err, res) => {
         res.should.have.status(400);
@@ -210,11 +206,11 @@ describe("/change-password", () => {
       });
   });
   it("should return error if  New password  do not match constrain", done => {
-    const loginDetails = { oldPassword: "MyPassword@123", newPassword: "MyPassword@" };
+    const passwordDetails = { oldPassword: "MyPassword@123", newPassword: "MyPassword@" };
     chai
       .request(app)
       .post("/change-password")
-      .send(loginDetails)
+      .send(passwordDetails)
       .set({ Authorization: `Bearer ${token}` })
       .end((err, res) => {
         res.should.have.status(400);
@@ -225,11 +221,11 @@ describe("/change-password", () => {
       });
   });
   it("should return error if  no token is provided", done => {
-    const loginDetails = { oldPassword: "MyPassword@123", newPassword: "MyPassword@321" };
+    const passwordDetails = { oldPassword: "MyPassword@123", newPassword: "MyPassword@321" };
     chai
       .request(app)
       .post("/change-password")
-      .send(loginDetails)
+      .send(passwordDetails)
       .end((err, res) => {
         res.should.have.status(400);
         res.body.should.be.a("object");
@@ -239,11 +235,11 @@ describe("/change-password", () => {
       });
   });
   it("should return error if old password is wrong", done => {
-    const loginDetails = { oldPassword: "MyPassword@321", newPassword: "MyPassword@321" };
+    const passwordDetails = { oldPassword: "MyPassword@321", newPassword: "MyPassword@321" };
     chai
       .request(app)
       .post("/change-password")
-      .send(loginDetails)
+      .send(passwordDetails)
       .set({ Authorization: `Bearer ${token}` })
       .end((err, res) => {
         res.should.have.status(400);
@@ -253,12 +249,12 @@ describe("/change-password", () => {
         done();
       });
   });
-  it("should return success message credentials are correct", done => {
-    const loginDetails = { oldPassword: "MyPassword@123", newPassword: "MyPassword@321" };
+  it("should return success message if  credentials are correct", done => {
+    const passwordDetails = { oldPassword: "MyPassword@123", newPassword: "MyPassword@321" };
     chai
       .request(app)
       .post("/change-password")
-      .send(loginDetails)
+      .send(passwordDetails)
       .set({ Authorization: `Bearer ${token}` })
       .end((err, res) => {
         res.should.have.status(200);
@@ -360,5 +356,35 @@ describe("/update/shipping", () => {
           done();
         });
     }
+  });
+});
+
+//reset Password
+
+describe("/password-reset", () => {
+  it("should return error if no email is provided", done => {
+    chai
+      .request(app)
+      .post("/password-reset")
+      .end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.be.a("object");
+        res.body.should.have.property("error");
+        res.body.error.should.equal(`"email" is required`);
+        done();
+      });
+  });
+  it("should return success message", done => {
+    chai
+      .request(app)
+      .post("/password-reset")
+      .send({ email: "gjai456@gmail.com" })
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.a("object");
+        res.body.should.have.property("message");
+        res.body.message.should.equal(`password reset link sent to your email account`);
+        done();
+      });
   });
 });

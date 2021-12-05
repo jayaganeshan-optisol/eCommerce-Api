@@ -25,7 +25,7 @@ export async function mail(name: string, email: string, subject: string, text: s
     console.log(htmlToSent);
     // send mail with defined transport object
     let info = await transporter.sendMail({
-      from: `"Jayaganeshan 👻" <${config.get("NODEMAILER_USER")}>`, // sender address
+      from: `"E-Commerce" <${config.get("NODEMAILER_USER")}>`, // sender address
       to: email, // list of receivers
       subject: subject, // Subject line
       html: htmlToSent, // plain text body

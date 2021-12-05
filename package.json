@@ -7,7 +7,7 @@
     "start": "node dist/app.js",
     "dev": "nodemon src/app.ts",
     "build-ts": "tsc -p .",
-    "test": "mocha --timeout 5000 --check-leaks -r ts-node/register -r tsconfig-paths/register \"src/test/**/*.test.ts\""
+    "test": "mocha --timeout 7000 --check-leaks -r ts-node/register -r tsconfig-paths/register \"src/test/**/*.test.ts\""
   },
   "keywords": [],
   "author": "Jayaganeshan",

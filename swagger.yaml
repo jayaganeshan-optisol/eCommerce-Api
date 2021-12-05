@@ -99,7 +99,7 @@ paths:
         - user
       security:
         - bearerAuth: []
-      summary: Returns all users in array
+      summary: Returns all users in array ONLY BY ADMIN
       description: Get all Users
       operationId: getAllUsers
       responses:
@@ -153,9 +153,7 @@ paths:
     post:
       tags:
         - user
-      security:
-        - bearerAuth: []
-      summary: Send mail to user
+      summary: Send reset mail to user's email
       description: Changing password
       operationId: mailResetPassword
       requestBody:
@@ -163,7 +161,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ResetPassword"
+              $ref: "#/components/schemas/ResetPasswordMail"
         required: true
       responses:
         "200":
@@ -185,9 +183,7 @@ paths:
     post:
       tags:
         - user
-      security:
-        - bearerAuth: []
-      summary: Redirect link 
+      summary: Completing the redirect password
       description: Changing password
       operationId: ResetPassword
       parameters:
@@ -201,6 +197,13 @@ paths:
           schema:
             type: string
           required: true
+      requestBody:
+        description: email for reset password link to be sent
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPassword"
+        required: true
       responses:
         "200":
           description: Success
@@ -310,7 +313,7 @@ paths:
         - Cart
       security:
         - bearerAuth: []
-      summary: Delete cart of user
+      summary: Delete all product in cart of user
       description: ""
       operationId: deleteAllCart
       responses:
@@ -334,7 +337,7 @@ paths:
         - Cart
       security:
         - bearerAuth: []
-      summary: Delete cart of user
+      summary: Delete a single product in cart of user
       description: ""
       operationId: delete product by id
       parameters:
@@ -389,7 +392,7 @@ paths:
         - Wish-List
       security:
         - bearerAuth: []
-      summary: Return Wishlist object
+      summary: Return result wishlist object
       description: ""
       operationId: addWishlist
       requestBody:
@@ -450,7 +453,7 @@ paths:
         - Wish-List
       security:
         - bearerAuth: []
-      summary: Remove all Products
+      summary: Remove all Products in wishlist
       description: ""
       operationId: deleteAllItemsWishlist
       responses:
@@ -683,7 +686,7 @@ paths:
         - Order
       security:
         - bearerAuth: []
-      summary: Return all orders in array by Admin
+      summary: Return all orders in array ONLY BY ADMIN
       description: ""
       operationId: getAllOrdersByAdmin
       responses:
@@ -776,7 +779,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AllOrdersByUserResult"
+                $ref: "#/components/schemas/AllOrdersItemsByUserResult"
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
@@ -837,7 +840,7 @@ components:
               example: gjai456@gmail.com
             password:
               type: string
-              example: Mypassword@07
+              example: MyPassword@123
             role:
               type: string
               example: both
@@ -847,20 +850,20 @@ components:
           properties:
             email:
               type: string
-              example: fakemail@gmail.com
+              example: gjai456@gmail.com
             password:
               type: string
-              example: 123456789
+              example: MyPassword@123
     ChangePwd:
       allOf:
         - type: object
           properties:
             oldPassword:
               type: string
-              example: "123456789"
+              example: MyPassword@123
             newPassword:
               type: string
-              example: "12345678"
+              example: MyPassword@321
     Shipping:
       allOf:
         - type: object
@@ -909,20 +912,27 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/CreateCart"
-    ResetPassword:
+    ResetPasswordMail:
       allOf:
         - type: object
           properties:
             email:
               type: string
               example: "gjai456@gmail.com"
+    ResetPassword:
+      allOf:
+        - type: object
+          properties:
+            password:
+              type: string
+              example: "MyPassword@123"
     CardDetails:
       allOf:
         - type: object
           properties:
             card:
               type: object
-              properties: 
+              properties:
                 number:
                   type: string
                   example: "4242424242424242"
@@ -935,7 +945,7 @@ components:
                 cvc:
                   type: string
                   example: "314"
-#User Response
+    #User Response
     User:
       allOf:
         - type: object
@@ -955,6 +965,9 @@ components:
             shipping_address:
               type: string
               example: null
+            stripe_id:
+              type: string
+              example: ch_3K2T8wSIoB4FwKhu1evZjBuy
             createdAt:
               type: string
               example: "2021-11-24T11:52:25.677Z"
@@ -1221,6 +1234,24 @@ components:
               totalprice:
                 type: number
                 example: 16000
+    AllOrdersItemsByUserResult:
+      allOf:
+        - type: array
+          items:
+            type: object
+            properties:
+              product_id:
+                type: number
+                example: 1
+              product_name:
+                type: string
+                example: product 1
+              quantity:
+                type: number
+                example: 16
+              unnit_price:
+                type: number
+                example: 599
     Payment:
       allOf:
         - type: object
@@ -1268,9 +1299,9 @@ components:
           schema:
             type: object
             properties:
-                error:
-                  type: string
-                  example: "Something failed!"
+              error:
+                type: string
+                example: "Something failed!"
 
   #security Schemes
   securitySchemes:
