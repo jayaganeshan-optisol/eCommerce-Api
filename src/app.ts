@@ -18,7 +18,7 @@ export const stripe = new Stripe(config.get("STRIPE_SK"), {
   apiVersion: "2020-08-27",
 });
 const app: Application = express();
-const PORT = 3000;
+const PORT = 3001;
 
 app.listen(PORT, (): void => {
   console.log(`Running on Port ${PORT}`);
@@ -32,6 +32,6 @@ app.use("/product", productRouter);
 app.use("/cart", cartRouter);
 app.use("/wishlist", ListRouter);
 app.use(error);
-db.sync({ force: true }).then(() => console.log("connected to DB"));
+db.authenticate().then(() => console.log("connected to DB"));
 
 export default app;

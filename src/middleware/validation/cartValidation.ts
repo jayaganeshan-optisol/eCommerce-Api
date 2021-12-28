@@ -8,9 +8,9 @@ export const validateCart = (req: Request, res: Response, next: NextFunction) =>
     quantity: req.body.quantity,
   };
   const scheme = Joi.object({
-    user_id: Joi.number().integer().strict().required(),
-    product_id: Joi.number().integer().strict().required(),
-    quantity: Joi.number().integer().strict().required(),
+    user_id: Joi.number().integer().required(),
+    product_id: Joi.number().integer().required(),
+    quantity: Joi.number().integer().required(),
   });
   const { error } = scheme.validate(cart);
   if (error) {

@@ -11,8 +11,8 @@ export const validateProduct = (req: Request, res: Response, next: NextFunction)
   const schema = Joi.object({
     product_name: Joi.string().required(),
     description: Joi.string().required(),
-    unit_price: Joi.number().integer().strict().required(),
-    number_in_stock: Joi.number().integer().strict().required(),
+    unit_price: Joi.number().integer().required(),
+    number_in_stock: Joi.number().integer().required(),
   });
   const { error } = schema.validate(product);
   if (error) {
@@ -32,8 +32,8 @@ export const validateProductUpdate = (req: Request, res: Response, next: NextFun
   const schema = Joi.object({
     product_name: Joi.string().optional(),
     description: Joi.string().optional(),
-    unit_price: Joi.number().integer().strict().optional(),
-    number_in_stock: Joi.number().integer().strict().optional(),
+    unit_price: Joi.number().integer().optional(),
+    number_in_stock: Joi.number().integer().optional(),
   });
   const { error } = schema.validate(product);
   if (error) {

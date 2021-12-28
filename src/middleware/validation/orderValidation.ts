@@ -7,8 +7,8 @@ export const validateOrder = (req: Request, res: Response, next: NextFunction) =
   let errorMessage;
   product.forEach((p: object) => {
     const schema = Joi.object({
-      product_id: Joi.number().integer().strict().required(),
-      quantity: Joi.number().integer().strict().required(),
+      product_id: Joi.number().integer().required(),
+      quantity: Joi.number().integer().required(),
     });
     const { error } = schema.validate(p);
     if (error) {
@@ -24,8 +24,8 @@ export const validateCard = (req: Request, res: Response, next: NextFunction) =>
 
   const schema = Joi.object({
     number: Joi.number().required(),
-    exp_month: Joi.number().integer().strict().required(),
-    exp_year: Joi.number().integer().strict().required(),
+    exp_month: Joi.number().integer().required(),
+    exp_year: Joi.number().integer().required(),
     cvc: Joi.number().required(),
   });
   const { error } = schema.validate(card);

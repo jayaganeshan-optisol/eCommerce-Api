@@ -45,11 +45,11 @@ const login = async (req: Request, res: Response) => {
   if (!user) {
     return res.status(404).send({ error: "Email Not found in db" });
   } else {
-    const { password } = user;
+    const { password,} = user;
     const pass = comparePassword(password, req.body.password);
     if (!pass) return res.status(400).send({ error: "Invalid Password" });
-    const { user_id, role, stripe_id } = user;
-    const token = generateToken({ user_id, role, stripe_id });
+    const { user_id, role, stripe_id,name} = user;
+    const token = generateToken({ name,user_id, role, stripe_id });
     return res.send({ token: token });
   }
 };

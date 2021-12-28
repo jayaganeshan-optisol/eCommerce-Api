@@ -7,8 +7,8 @@ export const validateWishlist = (req: Request, res: Response, next: NextFunction
     product_id: req.body.product_id,
   };
   const scheme = Joi.object({
-    user_id: Joi.number().integer().strict().required(),
-    product_id: Joi.number().integer().strict().required(),
+    user_id: Joi.number().integer().required(),
+    product_id: Joi.number().integer().required(),
   });
   const { error } = scheme.validate(wishlist);
   if (error) {

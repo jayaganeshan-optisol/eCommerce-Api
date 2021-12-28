@@ -94,10 +94,10 @@ const orderCart = async (req: Request, res: Response) => {
   for (let i = 0; i < product.length; i++) {
     const result: any = await getProductById(product[i].product_id);
     if (!result) {
-      errorProduct = "product id " + product[i].product_id + " not found";
+      errorProduct = "product " + product[i].product_name + " not found";
     }
     if (result.number_in_stock < product[i].quantity) {
-      errorProduct = "product id " + product[i].product_id + " don't have enough stock";
+      errorProduct = "product " + result.product_name + " don't have enough stock";
       break;
     }
     products.push(result);
