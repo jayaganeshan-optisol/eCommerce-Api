@@ -4,6 +4,7 @@ import { IOrderAttributes, Order } from "../models/Orders";
 import { OrderItems } from "../models/Order_items";
 import { Product } from "../models/Products";
 import { User } from "../models/User";
+import { Payment } from "../models/Payment";
 
 //@types
 export interface IOrderItems {
@@ -50,7 +51,7 @@ export const getProductsInOrderItems = async (order_id: number, user_id: number)
 };
 
 export const getProductsInOrder = async (user_id: number) => {
-  const result = Order.findAll({ where: { user_id }, include: { model: Product } });
+  const result = Order.findAll({ where: { user_id }, include: [{ model: Product }, { model: Payment }] });
   return result;
 };
 export const getOrderByUserIdOrderId = async (user_id: number, order_id: number) => {
@@ -61,5 +62,10 @@ export const getOrderByUserIdOrderId = async (user_id: number, order_id: number)
     },
     include: Product,
   });
+  return result;
+};
+
+export const getPaymentInfo = async (order_id: number) => {
+  const result = Payment.findOne({ where: { order_id } });
   return result;
 };

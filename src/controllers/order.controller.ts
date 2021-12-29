@@ -1,7 +1,7 @@
 import { Response, Request } from "express";
 import { db } from "../services/db";
 import { createOrderItems, getOrderItemsById } from "../dao/orderItems.dao";
-import { getAllOrders, placeOrder, cancelOrder, getOrderById, getProductsInOrder, getProductsInOrderItems, getOrderByUserIdOrderId } from "../dao/orders.dao.";
+import { getAllOrders, placeOrder, cancelOrder, getOrderById, getProductsInOrder, getProductsInOrderItems, getOrderByUserIdOrderId, getPaymentInfo } from "../dao/orders.dao.";
 import { getProductById, changeStockInProduct } from "../dao/products.dao";
 import { getUserByID } from "../dao/user.dao.";
 import { calcDate } from "../models/Orders";
@@ -27,7 +27,7 @@ const createOrder = async (req: Request, res: Response) => {
       break;
     }
     if (result.number_in_stock < product[i].quantity) {
-      errorProduct = "product id " + product[i].product_id + " don't have enough stock";
+      errorProduct = "product " + result.product_name + " don't have enough stock";
       break;
     }
     products.push(result);
@@ -109,6 +109,7 @@ const orderCart = async (req: Request, res: Response) => {
     await changeStockInProduct({ quantity: product[i].quantity, product_id: product[i].product_id }, "dec", t);
     await createOrderItems({ product_id: product[i].product_id, order_id: order.order_id, quantity: product[i].quantity }, t);
   }
+
   await t.commit();
   res.status(200).send({ message: "Order Placed Successfully" });
 };
@@ -117,13 +118,13 @@ const findOrderByUser = async (req: Request, res: Response) => {
   const { user_id } = req.body.tokenPayload;
   const orders: any = await getProductsInOrder(user_id);
   let result: any = [];
-  orders.forEach((order: any) => {
+  orders.forEach(async (order: any) => {
     let sum: number = 0;
     order.products.forEach((product: any) => {
       const temp = product.unit_price * product.order_item.quantity;
       sum = sum + temp;
     });
-    const orderDetails = { order_id: order.order_id, date: order.date, total_price: sum };
+    const orderDetails = { order_id: order.order_id, date: order.date, total_price: sum, payment_status: order.payment_info === null ? false : true };
     result.push(orderDetails);
   });
   res.send(result);
@@ -135,7 +136,7 @@ const findOrderItemsByUser = async (req: Request, res: Response) => {
   const order: any = await getProductsInOrderItems(parseInt(id), user_id);
   const orderItems: any = [];
   order.products.forEach((product: any) => {
-    const temp = { product_id: product.product_id, product_name: product.product_id, quantity: product.order_item.quantity, unit_price: product.unit_price };
+    const temp = { product_id: product.product_id, product_name: product.product_name, quantity: product.order_item.quantity, unit_price: product.unit_price };
     orderItems.push(temp);
   });
   res.send(orderItems);
@@ -154,7 +155,7 @@ const payment = async (req: Request, res: Response) => {
     sum = sum + temp;
   });
   const orderDetails = { order_id: order.order_id, date: order.date, total_price: sum };
-  //stripe
+  //stripe auto Payment
   const token: any = await stripe.tokens.create({ card });
   await stripe.customers.createSource(stripe_id, {
     source: token.id,
@@ -166,6 +167,7 @@ const payment = async (req: Request, res: Response) => {
   });
   console.log(id, paid);
   const paymentInfo = await Payment.create({ user_id, order_id, payment_date: order.date, payment_id: id, payment_status: paid });
+  console.log(paymentInfo);
   return res.send({ message: `Payment successful with paymentID card_1K1vc0SIoB4FwKhua5TLZi0t` });
 };
 export const orderController = { createOrder, ordersByUser, deleteOrder, orderCart, findOrderByUser, findOrderItemsByUser, payment };

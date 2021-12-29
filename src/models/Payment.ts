@@ -1,5 +1,6 @@
 import { Model, DataTypes, Optional } from "sequelize";
 import { db } from "../services/db";
+import { Order } from "./Orders";
 
 interface IPayment {
   user_id: number;
@@ -16,11 +17,11 @@ Payment.init(
   {
     user_id: {
       type: DataTypes.INTEGER.UNSIGNED,
-      primaryKey: true,
       allowNull: false,
     },
     order_id: {
       type: DataTypes.INTEGER.UNSIGNED,
+      primaryKey: true,
       allowNull: false,
     },
     payment_id: {

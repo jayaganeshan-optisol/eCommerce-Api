@@ -1,0 +1,16 @@
+{
+  "STRIPE_SK": "sk_test_51K1sL5SIoB4FwKhuw3E6Z23j8fXDGdjMAJJxTA0oadRdfOAyU4foZx2ESJt8FSJme40l59rBYe4C8kwMMcARrUAe00Blu6rQuE",
+  "EMAIL_VERIFY": "at_M8H2HEO0nSpWvinbBOxZYJMwjVtdQ",
+  "BASE_URL": "http://localhost:3000",
+  "NODEMAILER_USER": "mjayaganeshan@fastmail.com",
+  "NODEMAILER_PASS": "",
+  "PASS_HASH": "andfkasjfoaiwhaoweihfowiehriwaehfowieh/923429ajfa/f",
+  "SEC_HASH": "nakfhaosfhiaowieh-u2334u539u5/ajsfkasjdf",
+  "db": {
+    "schema": "sql_ecommerce",
+    "username": "ecommerce_user",
+    "password": "MyPassword@123",
+    "host": "localhost",
+    "dialect": "mysql"
+  }
+}

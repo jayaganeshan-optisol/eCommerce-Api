@@ -1,6 +1,7 @@
 import { Model, DataTypes, Optional } from "sequelize";
 import { db } from "../services/db";
 import { OrderItems } from "./Order_items";
+import { Payment } from "./Payment";
 import { Product } from "./Products";
 
 export interface IOrder {
@@ -18,7 +19,7 @@ Order.init(
       allowNull: false,
     },
     order_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.INTEGER.UNSIGNED,
       autoIncrement: true,
       allowNull: false,
       primaryKey: true,
@@ -35,6 +36,8 @@ Order.init(
 );
 Order.belongsToMany(Product, { through: OrderItems, foreignKey: "order_id" });
 Product.belongsToMany(Order, { through: OrderItems, foreignKey: "product_id" });
+
+Order.hasOne(Payment, { foreignKey: "order_id" });
 
 export const calcDate = () => {
   const date = new Date();
